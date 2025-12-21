@@ -293,3 +293,4 @@ Check `src/types/index.ts` for type definitions.
 
 **Need help?** Check ARCHITECTURE.md for detailed documentation.
 
+

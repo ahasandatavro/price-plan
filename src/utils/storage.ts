@@ -61,3 +61,4 @@ export const formatStorage = (gb: number): string => {
   return `${gb.toFixed(2)} GB`;
 };
 
+

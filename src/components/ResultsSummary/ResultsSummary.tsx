@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { CheckCircle } from 'lucide-react';
 import type { BillingCycle, CalculationResult } from '../../types';
 import { formatStorage } from '../../utils/storage';
 
@@ -12,37 +13,41 @@ interface ResultsSummaryProps {
   billingCycle: BillingCycle;
 }
 
-export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingCycle }) => {
+export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result }) => {
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 text-white">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 mt-6">
+      {/* Storage Summary */}
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
         <div>
-          <p className="text-purple-100 text-sm mb-1">Your Required Storage</p>
-          <p className="text-3xl font-bold">{formatStorage(result.totalStorage)}</p>
+          <p className="text-xs text-gray-500 mb-1">Total Required Storage</p>
+          <p className="text-2xl font-semibold text-gray-900">{formatStorage(result.totalStorage)}</p>
         </div>
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-          <p className="text-xs text-purple-100">HD: {formatStorage(result.hdStorage)}</p>
-          <p className="text-xs text-purple-100">4K: {formatStorage(result.fourKStorage)}</p>
+        <div className="text-right">
+          <p className="text-xs text-gray-500">HD: {formatStorage(result.hdStorage)}</p>
+          <p className="text-xs text-gray-500">4K: {formatStorage(result.fourKStorage)}</p>
         </div>
       </div>
       
-      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-        <p className="text-sm text-purple-100 mb-2">✨ Recommended Plan</p>
-        <div className="flex items-baseline gap-3 mb-2">
-          <span className="text-3xl font-bold">{result.recommendedPlan.name}</span>
-          <span className="text-2xl font-bold">
-            ${result.recommendedPlan.cost.toFixed(2)}
-          </span>
-          <span className="text-sm text-purple-100">
-            {billingCycle === 'annual' ? '/month (billed annually)' : '/month'}
-          </span>
+      {/* Recommended Plan */}
+      <div className="bg-blue-50 rounded border border-blue-200 p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <CheckCircle className="w-4 h-4 text-blue-600" />
+          <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Recommended</span>
         </div>
-        <div className="flex gap-4 text-sm text-purple-100">
-          <span>💾 {formatStorage(result.recommendedPlan.storage)}</span>
-          <span>👥 {result.recommendedPlan.users} user{result.recommendedPlan.users !== 1 ? 's' : ''}</span>
+        
+        <div className="flex items-baseline justify-between">
+          <div>
+            <p className="text-lg font-semibold text-gray-900">{result.recommendedPlan.name}</p>
+            <p className="text-xs text-gray-600 mt-0.5">
+              {formatStorage(result.recommendedPlan.storage)} • {result.recommendedPlan.users} user{result.recommendedPlan.users !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-semibold text-gray-900">${result.recommendedPlan.cost.toFixed(2)}</p>
+            <p className="text-xs text-gray-600">/month</p>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
