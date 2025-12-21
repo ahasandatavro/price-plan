@@ -14,6 +14,10 @@ interface ResultsSummaryProps {
 }
 
 export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result }) => {
+  if (!result.recommendedPlan) {
+    return null;
+  }
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 mt-6">
       {/* Storage Summary */}
