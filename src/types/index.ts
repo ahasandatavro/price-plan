@@ -39,7 +39,7 @@ export interface CalculationResult {
   totalStorage: number;
   hdStorage: number;
   fourKStorage: number;
-  recommendedPlan: Plan | EnterprisePlan;
+  recommendedPlan: Plan | EnterprisePlan | null;
   allPlans: Plans['monthly'] | Plans['annual'];
 }
 
@@ -48,5 +48,6 @@ export interface StorageInputs {
   duration: string;
   fourKPercent: string;
 }
+
 
 

@@ -15,8 +15,10 @@ interface PlansGridProps {
 
 export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) => {
   const isEnterprisePlan = (plan: any): plan is EnterprisePlan => {
-    return plan.isEnterprise === true;
+    return plan?.isEnterprise === true;
   };
+
+  const hasCalculation = result.totalStorage > 0 && result.recommendedPlan !== null;
 
   return (
     <div className="mb-8">
@@ -25,16 +27,20 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
           Choose Your Perfect Plan
         </h2>
         <p className="text-lg text-gray-600">
-          Select the plan that best fits your video storage needs
+          {hasCalculation 
+            ? 'Select the plan that best fits your video storage needs'
+            : 'Explore our available plans'}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {Object.entries(result.allPlans).map(([key, plan]) => {
           const isRecommended = 
+            hasCalculation &&
+            result.recommendedPlan !== null &&
             plan.name === result.recommendedPlan.name && 
             !isEnterprisePlan(result.recommendedPlan);
-          const meetsRequirement = plan.storage >= result.totalStorage;
+          const meetsRequirement = !hasCalculation || plan.storage >= result.totalStorage;
           
           return (
             <PlanCard
@@ -47,7 +53,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
           );
         })}
 
-        {isEnterprisePlan(result.recommendedPlan) && (
+        {hasCalculation && result.recommendedPlan && isEnterprisePlan(result.recommendedPlan) && (
           <EnterprisePlanCard
             plan={result.recommendedPlan}
             billingCycle={billingCycle}

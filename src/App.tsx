@@ -3,8 +3,8 @@
  * Video Storage Plan Calculator
  */
 
-import React, { useState } from 'react';
-import { Calculator, ChevronDown, ChevronUp } from 'lucide-react';
+import React from 'react';
+import { Calculator } from 'lucide-react';
 import { useStorageCalculator } from './hooks/useStorageCalculator';
 import {
   CalculatorForm,
@@ -14,7 +14,6 @@ import {
 } from './components';
 
 const VideoStorageCalculator: React.FC = () => {
-  const [showAllPlans, setShowAllPlans] = useState(false);
   const { inputs, updateInput, billingCycle, setBillingCycle, result } = useStorageCalculator();
 
   return (
@@ -32,22 +31,10 @@ const VideoStorageCalculator: React.FC = () => {
 
           <BillingToggle billingCycle={billingCycle} onToggle={setBillingCycle} />
 
-          {result && <ResultsSummary result={result} billingCycle={billingCycle} />}
+          {result && result.totalStorage > 0 && <ResultsSummary result={result} billingCycle={billingCycle} />}
         </div>
 
-        {result && (
-          <div className="text-center mb-6">
-            <button
-              onClick={() => setShowAllPlans(!showAllPlans)}
-              className="inline-flex items-center gap-2 bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition"
-            >
-              {showAllPlans ? 'Hide' : 'View'} All Plans & Features
-              {showAllPlans ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
-          </div>
-        )}
-
-        {result && showAllPlans && <PlansGrid result={result} billingCycle={billingCycle} />}
+        {result && <PlansGrid result={result} billingCycle={billingCycle} />}
       </div>
     </div>
   );

@@ -22,17 +22,25 @@ export const useStorageCalculator = () => {
     setInputs(prev => ({ ...prev, [field]: value }));
   };
 
-  const calculateStorage = (): CalculationResult | null => {
+  const calculateStorage = (): CalculationResult => {
     const films = parseFloat(inputs.films);
     const duration = parseFloat(inputs.duration);
     const fourKPercent = parseFloat(inputs.fourKPercent);
+    const currentPlans = PLANS[billingCycle];
 
+    // If inputs are empty or invalid, return default result with all plans but no recommendation
     if (!films || !duration || inputs.fourKPercent === '') {
-      return null;
+      return {
+        totalStorage: 0,
+        hdStorage: 0,
+        fourKStorage: 0,
+        recommendedPlan: null,
+        allPlans: currentPlans
+      };
     }
 
+    // Calculate storage and find recommended plan
     const { total, hd, fourK } = calculateTotalStorage(films, duration, fourKPercent);
-    const currentPlans = PLANS[billingCycle];
     const recommendedPlan = findRecommendedPlan(total, currentPlans);
 
     return {
