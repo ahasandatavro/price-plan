@@ -28,14 +28,28 @@ export const findRecommendedPlan = (
 
 /**
  * Create an enterprise plan with custom pricing
+ * 
+ * Pricing structure:
+ * - Base cost: Business plan cost (covers up to 1.2 TB = 1228.8 GB)
+ * - Additional storage: Charged based on tier that total storage falls into
+ *   - 1.2 TB - 2.4 TB: $0.875 per GB for additional storage
+ *   - 2.4 TB - 5 TB: $0.8125 per GB for additional storage
+ *   - 5 TB - 10 TB: $0.75 per GB for additional storage
  */
 const createEnterprisePlan = (
   totalStorage: number,
   businessPlan: Plan
 ): EnterprisePlan => {
+  // Calculate additional storage beyond business plan (1.2 TB = 1228.8 GB)
   const extraStorage = totalStorage - businessPlan.storage;
+  
+  // Get tier rate based on which tier the TOTAL storage falls into
   const tierRate = getEnterpriseTierRate(totalStorage);
+  
+  // Calculate additional cost: extra storage × tier rate
   const additionalCost = extraStorage * tierRate;
+  
+  // Total cost: business plan base + additional storage cost
   const totalCost = businessPlan.cost + additionalCost;
   
   return {

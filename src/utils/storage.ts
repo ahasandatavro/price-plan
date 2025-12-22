@@ -40,14 +40,26 @@ export const calculateTotalStorage = (
 };
 
 /**
- * Get enterprise tier rate based on storage amount
+ * Get enterprise tier rate based on total storage amount
+ * The rate is determined by which tier the TOTAL storage falls into,
+ * then applied to additional storage beyond business plan (1.2 TB = 1228.8 GB)
+ * 
+ * Tiers:
+ * - 0 TB - 1.2 TB (0 - 1228.8 GB): $0.9375 per GB (covered by business plan)
+ * - 1.2 TB - 2.4 TB (1228.8 - 2457.6 GB): $0.875 per GB
+ * - 2.4 TB - 5 TB (2457.6 - 5120 GB): $0.8125 per GB
+ * - 5 TB - 10 TB (5120 - 10240 GB): $0.75 per GB
  */
 export const getEnterpriseTierRate = (storageGB: number): number => {
+  // Tiers are ordered from highest to lowest threshold
+  // Return the rate for the first tier where storage exceeds the threshold
   for (const tier of ENTERPRISE_TIER_RATES) {
     if (storageGB > tier.threshold) {
       return tier.rate;
     }
   }
+  // If storage is <= 1228.8 GB, it's covered by business plan (no additional charge)
+  // But this shouldn't happen as enterprise plans only apply when storage > business plan
   return DEFAULT_TIER_RATE;
 };
 

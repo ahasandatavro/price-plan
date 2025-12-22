@@ -95,9 +95,9 @@ export const PlanCard: React.FC<PlanCardProps> = ({
           <button
             className={`w-full py-3 rounded font-medium text-sm transition-colors ${
               isRecommended
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                 : meetsRequirement
-                ? 'bg-gray-900 text-white hover:bg-gray-800'
+                ? 'bg-gray-900 text-white hover:bg-gray-800 cursor-pointer'
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
             disabled={!meetsRequirement}

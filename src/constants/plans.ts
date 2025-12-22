@@ -138,12 +138,18 @@ export const STORAGE_RATES = {
   FOUR_K_PER_MINUTE: 16 / 60
 } as const;
 
+// Enterprise tier rates for additional storage beyond business plan (1.2 TB = 1228.8 GB)
+// Rates are based on which tier the TOTAL storage falls into
+// Business plan covers up to 1.2 TB, additional storage is charged based on tier
 export const ENTERPRISE_TIER_RATES = [
-  { threshold: 10240, rate: 0.65 },
-  { threshold: 5120, rate: 0.65 },
-  { threshold: 2457.6, rate: 0.72 },
-  { threshold: 1228.8, rate: 0.80 }
+  { threshold: 10240, rate: 0.75 },   // 5 TB - 10 TB: $0.75 per GB
+  { threshold: 5120, rate: 0.8125 }, // 2.4 TB - 5 TB: $0.8125 per GB
+  { threshold: 2457.6, rate: 0.875 }, // 1.2 TB - 2.4 TB: $0.875 per GB
+  { threshold: 1228.8, rate: 0.9375 } // 0 TB - 1.2 TB: $0.9375 per GB (covered by business plan)
 ] as const;
 
-export const DEFAULT_TIER_RATE = 0.89;
+export const DEFAULT_TIER_RATE = 0.9375;
+
+// Annual billing discount percentage
+export const ANNUAL_DISCOUNT_PERCENT = 16;
 

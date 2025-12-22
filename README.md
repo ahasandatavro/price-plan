@@ -88,7 +88,7 @@ npm run dev
 - **Pro**: 600 GB, 2 users - $61/month
 - **Business**: 1.2 TB, 5 users - $111/month
 
-### Annual Plans (Save up to 15%)
+### Annual Plans (Save up to 16%)
 - **Free**: 10 GB, 1 user
 - **Starter**: 50 GB, 1 user - $21/month
 - **Growth**: 100 GB, 1 user - $37/month

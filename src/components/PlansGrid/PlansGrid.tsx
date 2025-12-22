@@ -20,6 +20,29 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
 
   const hasCalculation = result.totalStorage > 0 && result.recommendedPlan !== null;
 
+  // Sort plans so recommended plan appears first
+  const planEntries = Object.entries(result.allPlans);
+  const sortedPlans = [...planEntries].sort(([_keyA, planA], [_keyB, planB]) => {
+    // Check if planA is recommended
+    const isPlanARecommended = 
+      hasCalculation &&
+      result.recommendedPlan !== null &&
+      planA.name === result.recommendedPlan.name && 
+      !isEnterprisePlan(result.recommendedPlan);
+    
+    // Check if planB is recommended
+    const isPlanBRecommended = 
+      hasCalculation &&
+      result.recommendedPlan !== null &&
+      planB.name === result.recommendedPlan.name && 
+      !isEnterprisePlan(result.recommendedPlan);
+    
+    // Recommended plan should come first
+    if (isPlanARecommended && !isPlanBRecommended) return -1;
+    if (!isPlanARecommended && isPlanBRecommended) return 1;
+    return 0; // Keep original order for non-recommended plans
+  });
+
   return (
     <div className="mb-8">
       <div className="text-center mb-12">
@@ -34,7 +57,16 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {Object.entries(result.allPlans).map(([key, plan]) => {
+        {/* Render enterprise plan first if it's recommended */}
+        {hasCalculation && result.recommendedPlan && isEnterprisePlan(result.recommendedPlan) && (
+          <EnterprisePlanCard
+            plan={result.recommendedPlan}
+            billingCycle={billingCycle}
+          />
+        )}
+
+        {/* Render regular plans (with recommended plan first) */}
+        {sortedPlans.map(([key, plan]) => {
           const isRecommended = 
             hasCalculation &&
             result.recommendedPlan !== null &&
@@ -52,13 +84,6 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
             />
           );
         })}
-
-        {hasCalculation && result.recommendedPlan && isEnterprisePlan(result.recommendedPlan) && (
-          <EnterprisePlanCard
-            plan={result.recommendedPlan}
-            billingCycle={billingCycle}
-          />
-        )}
       </div>
     </div>
   );
