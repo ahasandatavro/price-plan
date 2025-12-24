@@ -95,9 +95,14 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({ plan, bi
         </div>
 
         <div className="mt-auto">
-          <button className="w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer">
+          <a
+            href="https://mediazilla.com/onboarding"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer block text-center"
+          >
             📞 Contact Sales Team
-          </button>
+          </a>
           
           <p className="text-center text-xs text-gray-500 mt-3">
             Get a personalized quote and dedicated support

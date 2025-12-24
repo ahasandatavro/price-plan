@@ -92,18 +92,27 @@ export const PlanCard: React.FC<PlanCardProps> = ({
             </div>
           )}
 
-          <button
-            className={`w-full py-3 rounded font-medium text-sm transition-colors ${
-              isRecommended
-                ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                : meetsRequirement
-                ? 'bg-gray-900 text-white hover:bg-gray-800 cursor-pointer'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
-            disabled={!meetsRequirement}
-          >
-            {meetsRequirement ? 'Get Started' : 'Unavailable'}
-          </button>
+          {meetsRequirement ? (
+            <a
+              href="https://mediazilla.com/onboarding"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`w-full py-3 rounded font-medium text-sm transition-colors block text-center ${
+                isRecommended
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  : 'bg-gray-900 text-white hover:bg-gray-800 cursor-pointer'
+              }`}
+            >
+              Get Started
+            </a>
+          ) : (
+            <button
+              className="w-full py-3 rounded font-medium text-sm transition-colors bg-gray-200 text-gray-500 cursor-not-allowed"
+              disabled
+            >
+              Unavailable
+            </button>
+          )}
         </div>
       </div>
     </div>
