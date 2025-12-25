@@ -63,7 +63,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({ plan, bi
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-100 to-blue-100 p-5 rounded-xl mb-6 border border-purple-200">
+        {/* <div className="bg-gradient-to-br from-purple-100 to-blue-100 p-5 rounded-xl mb-6 border border-purple-200">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-5 h-5 text-purple-700" />
             <p className="font-bold text-gray-900 text-sm">Pricing Breakdown</p>
@@ -81,7 +81,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({ plan, bi
               <p className="text-xs text-gray-600">Rate: ${plan.tierRate}/GB for extra storage</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="space-y-3 mb-6 flex-grow">
           {plan.features.map((feature, idx) => (

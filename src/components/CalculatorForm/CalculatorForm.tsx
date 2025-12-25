@@ -62,7 +62,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Calculate Storage Requirements</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Calculate Upload Qouta Requirements</h3>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Films per year */}
@@ -107,7 +107,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
         <div>
           <label htmlFor="fourk-percent" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
         
-            Percentage(%) of total film delivery in 4K 
+            Percentage(%) of total film delivered in 4K 
           </label>
           <div className="relative">
             <input
