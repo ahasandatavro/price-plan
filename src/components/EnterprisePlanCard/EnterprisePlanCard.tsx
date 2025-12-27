@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Check, Star, Users, Database, Crown, TrendingUp } from 'lucide-react';
+import { Check, Star, Users, Database, Crown } from 'lucide-react';
 import type { EnterprisePlan, BillingCycle } from '../../types';
 import { formatStorage } from '../../utils/storage';
 
