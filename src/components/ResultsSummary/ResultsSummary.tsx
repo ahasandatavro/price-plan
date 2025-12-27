@@ -55,7 +55,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result }) => {
           </div>
         </>
       ) : (
-        <div className="text-center py-16">
+        <div className="text-center py-5 md:py-16 lg:py-24">
           <p className="text-gray-500 text-sm">
             Input values to show your storage quote and pricing
           </p>
