@@ -42,7 +42,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({ plan, bi
             <div className="flex items-center gap-2 flex-1">
               <Database className="w-4 h-4 text-gray-600" />
               <div className="text-left">
-                <p className="text-xs text-gray-500">Storage</p>
+                <p className="text-xs text-gray-500">Upload quota</p>
                 <p className="text-sm font-medium text-gray-900">{formatStorage(plan.storage)}</p>
               </div>
             </div>
