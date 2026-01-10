@@ -21,13 +21,11 @@ export interface EnterprisePlan extends Plan {
 
 export interface Plans {
   monthly: {
-    free: Plan;
     growth: Plan;
     pro: Plan;
     business: Plan;
   };
   annual: {
-    free: Plan;
     starter: Plan;
     growth: Plan;
     pro: Plan;

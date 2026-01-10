@@ -6,19 +6,6 @@ import type { Plans } from '../types';
 
 export const PLANS: Plans = {
   monthly: {
-    free: { 
-      name: 'Free', 
-      cost: 0, 
-      storage: 10, 
-      users: 1,
-      features: [
-        '10 GB upload',
-        '1-year streaming access',
-        'Premium delivery & app viewing',
-        'Allow video downloading',
-        'Password-protected sharing'
-      ]
-    },
     growth: { 
       name: 'Growth', 
       cost: 44, 
@@ -62,19 +49,6 @@ export const PLANS: Plans = {
     }
   },
   annual: {
-    free: { 
-      name: 'Free', 
-      cost: 0, 
-      storage: 10, 
-      users: 1,
-      features: [
-        '10 GB upload',
-        '1-year streaming access',
-        'Premium delivery & app viewing',
-        'Allow video downloading',
-        'Password-protected sharing'
-      ]
-    },
     starter: { 
       name: 'Starter', 
       cost: 21, 
