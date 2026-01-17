@@ -51,7 +51,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
         </h2>
         <p className="text-lg text-gray-600">
           {hasCalculation 
-            ? 'Select the plan that best fits your video storage needs'
+            ? 'Select the plan that best fits your video upload quota needs'
             : 'Explore our available plans'}
         </p>
       </div>

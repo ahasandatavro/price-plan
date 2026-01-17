@@ -24,7 +24,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result }) => {
           {/* Storage Summary */}
           <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
             <div>
-              <p className="text-xs text-gray-500 mb-1">Total Required Storage</p>
+              <p className="text-xs text-gray-500 mb-1">Total Required Upload Quota</p>
               <p className="text-2xl font-semibold text-gray-900">{formatStorage(result.totalStorage)}</p>
             </div>
             <div className="text-right">

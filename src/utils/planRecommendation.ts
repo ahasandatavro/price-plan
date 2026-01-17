@@ -62,7 +62,7 @@ const createEnterprisePlan = (
     additionalCost: additionalCost,
     tierRate: tierRate,
     features: [
-      formatStorage(totalStorage) + ' custom storage',
+      formatStorage(totalStorage) + ' custom upload quota',
       '5+ users',
       'Everything in Business plan',
       'Dedicated account manager',

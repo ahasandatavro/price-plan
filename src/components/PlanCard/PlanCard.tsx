@@ -88,7 +88,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
         <div className="mt-auto">
           {!meetsRequirement && (
             <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-              Insufficient storage for your needs
+              Insufficient upload quota for your needs
             </div>
           )}
 
