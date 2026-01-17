@@ -64,7 +64,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
     <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Calculate Upload Quota Requirements</h3>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1  lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {/* Films per year */}
         <div>
           <label htmlFor="films" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
