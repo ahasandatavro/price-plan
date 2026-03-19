@@ -206,7 +206,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-gray-100">
                     <span className="text-gray-500">
-                      Extra quota
+                      Pay as you go
                       <span className="ml-1 text-xs text-gray-400">({formatStorage(selectedOption.additionalGB)})</span>
                     </span>
                     <span className="font-medium text-gray-800">${selectedOption.additionalCost.toFixed(2)}/yr</span>

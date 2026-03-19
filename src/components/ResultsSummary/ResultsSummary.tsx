@@ -211,7 +211,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           </div>
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
                             <span className="text-gray-500">
-                              Extra quota
+                              Pre-paid quota
                               <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
                             </span>
                             <span className="font-medium text-gray-800">
@@ -229,7 +229,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           </div>
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
                             <span className="text-gray-500">
-                              Extra quota
+                              Pay as you go
                               <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
                             </span>
                             <span className="font-medium text-gray-800">
