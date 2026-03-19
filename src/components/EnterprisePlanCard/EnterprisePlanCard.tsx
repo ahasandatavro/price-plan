@@ -16,11 +16,12 @@ interface EnterprisePlanCardProps {
 
 export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
   plan,
-  billingCycle,
   requiredStorage = 0
 }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
   const additionalGB = Math.max(0, requiredStorage - 1228.8);
+  const baseAnnualCost = plan.baseCost * 12;
+  const totalAnnualCost = baseAnnualCost + plan.additionalCost;
 
   return (
     <div className="h-full [perspective:1200px]">
@@ -40,15 +41,13 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-semibold text-gray-900">
-                    ${plan.cost.toFixed(2)}
+                    ${totalAnnualCost.toFixed(2)}
                   </span>
-                  <span className="text-gray-600 text-base">/month</span>
+                  <span className="text-gray-600 text-base">/year</span>
                 </div>
-                {billingCycle === 'annual' && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    ${(plan.cost * 12).toFixed(0)} billed annually
-                  </p>
-                )}
+                <p className="text-sm text-gray-600 mt-2">
+                  {totalAnnualCost.toFixed(2)} billed annually
+                </p>
               </div>
 
               <div className="flex items-center gap-4 py-3 px-4 bg-gray-50 rounded border border-gray-200">
@@ -151,8 +150,8 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
 
               <div className="flex flex-col gap-1.5 text-sm">
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Base plan / month</span>
-                  <span className="font-medium text-gray-800">${plan.baseCost.toFixed(2)}</span>
+                  <span className="text-gray-500">Business base (yearly)</span>
+                  <span className="font-medium text-gray-800">${baseAnnualCost.toFixed(2)}</span>
                 </div>
 
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
@@ -161,11 +160,6 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
                     <span className="ml-1 text-xs text-gray-400">({formatStorage(additionalGB)})</span>
                   </span>
                   <span className="font-medium text-gray-800">${plan.additionalCost.toFixed(2)}/yr</span>
-                </div>
-
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Base × 12 months</span>
-                  <span className="font-medium text-gray-800">${(plan.baseCost * 12).toFixed(2)}</span>
                 </div>
               </div>
 

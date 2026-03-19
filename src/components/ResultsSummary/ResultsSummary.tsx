@@ -20,6 +20,7 @@ interface ResultsSummaryProps {
 export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingCycle }) => {
   const hasData = result.totalStorage > 0 && result.recommendedPlan;
   const recommendedPlan = result.recommendedPlan;
+  const isEnterprise = (recommendedPlan as any)?.isEnterprise === true;
 
   const [whyOpen, setWhyOpen] = useState(false);
 
@@ -138,8 +139,21 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-semibold text-gray-900">${recommendedPlan.cost.toFixed(2)}</p>
-                <p className="text-xs text-gray-600">/month</p>
+                {isEnterprise ? (
+                  <>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      ${(
+                        (recommendedPlan as any).baseCost * 12 + (recommendedPlan as any).additionalCost
+                      ).toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-600">/year</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-2xl font-semibold text-gray-900">${recommendedPlan.cost.toFixed(2)}</p>
+                    <p className="text-xs text-gray-600">/month</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -185,32 +199,86 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
 
                     {/* Line items */}
                     <div className="p-4 flex flex-col text-sm gap-1.5">
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span className="text-gray-500">Base plan / month</span>
-                        <span className="font-medium text-gray-800">${whyData.recommended.baseCost.toFixed(2)}</span>
-                      </div>
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span className="text-gray-500">
-                          Extra quota
-                          <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
-                        </span>
-                        <span className="font-medium text-gray-800">${whyData.recommended.additionalCost.toFixed(2)}/yr</span>
-                      </div>
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span className="text-gray-500">Base × 12 months</span>
-                        <span className="font-medium text-gray-800">${(whyData.recommended.baseCost * 12).toFixed(2)}</span>
-                      </div>
+                      {isEnterprise ? (
+                        <>
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-500">
+                              Business base (yearly)
+                            </span>
+                            <span className="font-medium text-gray-800">
+                              ${(whyData.recommended.baseCost * 12).toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-500">
+                              Extra quota
+                              <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
+                            </span>
+                            <span className="font-medium text-gray-800">
+                              ${whyData.recommended.additionalCost.toFixed(2)}/yr
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-500">Base plan / month</span>
+                            <span className="font-medium text-gray-800">
+                              ${whyData.recommended.baseCost.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-gray-500">
+                              Extra quota
+                              <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
+                            </span>
+                            <span className="font-medium text-gray-800">
+                              ${whyData.recommended.additionalCost.toFixed(2)}/yr
+                            </span>
+                          </div>
+                          {billingCycle === 'annual' && (
+                            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                              <span className="text-gray-500">Annual billing cycle</span>
+                              <span className="font-medium text-gray-800">
+                                ${(whyData.recommended.baseCost * 12).toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
 
-                    {/* Annual total callout */}
+                    {/* Totals callout */}
                     <div className="p-4 pt-0">
                       <div className="bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 border border-[#AD0FF0]/20 rounded-lg px-4 py-3 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-[#AD0FF0]">Annual Total</span>
-                        <span className="text-lg font-bold text-[#AD0FF0]">
-                          ${whyData.recommended.totalCost.toFixed(2)}
-                          <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
-                        </span>
+                        {billingCycle === 'monthly' ? (
+                          <>
+                            <span className="text-sm font-semibold text-[#AD0FF0]">Pay today</span>
+                            <span className="text-lg font-bold text-[#AD0FF0]">
+                              ${whyData.recommended.baseCost.toFixed(2)}
+                              <span className="text-xs font-medium text-[#AD0FF0]/70">/month</span>
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-sm font-semibold text-[#AD0FF0]">Pay today</span>
+                            <span className="text-lg font-bold text-[#AD0FF0]">
+                              ${(whyData.recommended.baseCost * 12).toFixed(2)}
+                              <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
+                            </span>
+                          </>
+                        )}
                       </div>
+                      {/* CTA */}
+                      <a
+                        href="https://mediazilla.com/onboarding"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 w-full py-3 px-4 rounded font-medium text-sm transition-colors bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer block text-center"
+                        onClick={() => setWhyOpen(false)}
+                      >
+                        Get Started
+                      </a>
                     </div>
                   </div>
                 </div>

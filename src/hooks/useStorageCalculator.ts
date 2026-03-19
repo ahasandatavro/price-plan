@@ -43,7 +43,7 @@ export const useStorageCalculator = () => {
     const normalizedFourKFilms = Math.max(0, Math.min(fourKFilms, films));
     const fourKPercent = films > 0 ? (normalizedFourKFilms / films) * 100 : 0;
     const { total, hd, fourK } = calculateTotalStorage(films, duration, fourKPercent);
-    const recommendedPlan = findRecommendedPlan(total, currentPlans, billingCycle);
+    const recommendedPlan = findRecommendedPlan(total, PLANS, billingCycle);
 
     return {
       totalStorage: total,

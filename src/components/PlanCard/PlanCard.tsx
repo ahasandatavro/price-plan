@@ -211,19 +211,33 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                     </span>
                     <span className="font-medium text-gray-800">${selectedOption.additionalCost.toFixed(2)}/yr</span>
                   </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-gray-500">Base × 12 months</span>
-                    <span className="font-medium text-gray-800">${(selectedOption.baseCost * 12).toFixed(2)}</span>
-                  </div>
+                  {billingCycle === 'annual' && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-gray-500">Annual billing cycle</span>
+                      <span className="font-medium text-gray-800">${(selectedOption.baseCost * 12).toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Total callout */}
                 <div className="mt-auto bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 border border-[#AD0FF0]/20 rounded-lg px-4 py-3 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-[#AD0FF0]">Annual Total</span>
-                  <span className="text-lg font-bold text-[#AD0FF0]">
-                    ${selectedOption.totalCost.toFixed(2)}
-                    <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
-                  </span>
+                  {billingCycle === 'monthly' ? (
+                    <>
+                      <span className="text-sm font-semibold text-[#AD0FF0]">Pay today</span>
+                      <span className="text-lg font-bold text-[#AD0FF0]">
+                        ${selectedOption.baseCost.toFixed(2)}
+                        <span className="text-xs font-medium text-[#AD0FF0]/70">/month</span>
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm font-semibold text-[#AD0FF0]">Pay today</span>
+                      <span className="text-lg font-bold text-[#AD0FF0]">
+                        ${(selectedOption.baseCost * 12).toFixed(2)}
+                        <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (

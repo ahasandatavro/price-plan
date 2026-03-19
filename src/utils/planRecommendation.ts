@@ -102,21 +102,27 @@ export const getRangeComparisonForStorage = (
  */
 export const findRecommendedPlan = (
   totalStorage: number,
-  plans: Plans['monthly'] | Plans['annual'],
+  plans: Plans,
   billingCycle: BillingCycle
 ): Plan | EnterprisePlan => {
+  const currentPlans = plans[billingCycle];
+
   // Business includes up to 1.2 TB. Anything above is Enterprise.
-  if (totalStorage > plans.business.storage) {
-    return createEnterprisePlan(totalStorage, plans.business, billingCycle);
+  if (totalStorage > currentPlans.business.storage) {
+    // Enterprise base always uses the annual business tier so the
+    // calculation shown matches the yearly toggle in both modes.
+    return createEnterprisePlan(totalStorage, plans.annual.business);
   }
 
-  const comparison = getRangeComparisonForStorage(totalStorage, plans, billingCycle);
-  const bestPlan = comparison.recommended ? (plans as any)[comparison.recommended.key] as Plan : null;
+  const comparison = getRangeComparisonForStorage(totalStorage, currentPlans, billingCycle);
+  const bestPlan = comparison.recommended
+    ? (currentPlans as unknown as Record<string, Plan>)[comparison.recommended.key]
+    : null;
 
   // If no regular plan can cover the requirement within the regular on-demand limit,
   // fall back to an enterprise plan with custom pricing.
   if (!bestPlan) {
-    return createEnterprisePlan(totalStorage, plans.business, billingCycle);
+    return createEnterprisePlan(totalStorage, plans.annual.business);
   }
 
   return bestPlan;
@@ -132,8 +138,7 @@ export const findRecommendedPlan = (
  */
 const createEnterprisePlan = (
   totalStorage: number,
-  businessPlan: Plan,
-  billingCycle: BillingCycle
+  businessPlan: Plan
 ): EnterprisePlan => {
   // Calculate additional storage beyond business plan (1.2 TB = 1228.8 GB)
   const extraStorage = Math.max(0, totalStorage - businessPlan.storage);
@@ -147,9 +152,8 @@ const createEnterprisePlan = (
 
   // Enterprise base cost is a monthly subscription.
   // Additional quota is shown separately and treated as one-time yearly.
-  // Use billingCycle in an expression to avoid an unused-parameter lint.
-  const monthlyBaseCost = billingCycle === 'annual' ? businessPlan.cost : businessPlan.cost;
-  
+  const monthlyBaseCost = businessPlan.cost;
+
   return {
     name: 'Enterprise',
     cost: monthlyBaseCost,
