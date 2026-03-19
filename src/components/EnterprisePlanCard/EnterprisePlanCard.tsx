@@ -6,7 +6,7 @@
 import React from 'react';
 import { Check, Users, Database, Eye, EyeOff } from 'lucide-react';
 import type { EnterprisePlan, BillingCycle } from '../../types';
-import { formatStorage, getEnterpriseTierSelection } from '../../utils/storage';
+import { formatStorage } from '../../utils/storage';
 
 interface EnterprisePlanCardProps {
   plan: EnterprisePlan;
@@ -21,7 +21,6 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
 }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
   const additionalGB = Math.max(0, requiredStorage - 1228.8);
-  const selectedTier = getEnterpriseTierSelection(additionalGB);
 
   return (
     <div className="h-full [perspective:1200px]">
@@ -29,8 +28,8 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
         className="relative h-full transition-transform duration-500 [transform-style:preserve-3d]"
         style={{ transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
       >
-        <div className="relative rounded-lg overflow-hidden transition-all duration-200 flex flex-col h-full bg-white border border-blue-600 shadow-sm [backface-visibility:hidden]">
-          <div className="bg-blue-600 text-white text-center py-2 px-4">
+        <div className="relative rounded-lg overflow-hidden transition-all duration-200 flex flex-col h-full bg-white border border-[#AD0FF0] shadow-sm [backface-visibility:hidden]">
+          <div className="bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white text-center py-2 px-4">
             <span className="text-xs font-semibold uppercase tracking-wider">Recommended</span>
           </div>
 
@@ -75,7 +74,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
               {plan.features.map((feature, idx) => (
                 <div key={idx} className="flex items-start gap-2">
                   <div className="mt-0.5 flex-shrink-0">
-                    <Check className="w-4 h-4 text-blue-600" />
+                    <Check className="w-4 h-4 text-black" />
                   </div>
                   <span className="text-sm text-gray-700">{feature}</span>
                 </div>
@@ -85,7 +84,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
             <div className="mt-auto">
               <button
                 type="button"
-                className=" cursor-pointer w-full mb-3 py-2 rounded border border-blue-200 text-blue-700 bg-blue-50 text-sm font-medium hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                className=" cursor-pointer w-full mb-3 py-2 rounded border border-[#AD0FF0]/20 text-[#AD0FF0] bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 text-sm font-medium hover:bg-gradient-to-r hover:from-[#594AE0]/20 hover:to-[#AD0FF0]/20 transition-colors flex items-center justify-center gap-2"
                 onClick={() => setIsFlipped(true)}
               >
                 <Eye className="w-4 h-4" />
@@ -96,7 +95,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
                 href="https://mediazilla.com/onboarding"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 rounded font-medium text-sm transition-colors bg-blue-600 text-white hover:bg-blue-700 cursor-pointer block text-center"
+                className="w-full py-3 rounded font-medium text-sm transition-colors bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer block text-center"
               >
                 Contact Sales Team
               </a>
@@ -104,51 +103,79 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
           </div>
         </div>
 
-        <div className="absolute inset-0 rounded-lg border border-blue-600 bg-white shadow-sm p-6 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <div className="h-full flex flex-col">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">Why Recommended</p>
-                <h3 className="text-xl font-semibold text-gray-900 mt-1">Enterprise</h3>
+        <div className="absolute inset-0 rounded-lg border border-[#AD0FF0] bg-white shadow-sm [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden flex flex-col">
+          <div className="bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] px-5 py-3 flex items-center justify-between flex-shrink-0">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white">Why Recommended</p>
+              <h3 className="text-base font-semibold text-white mt-0.5">{plan.name}</h3>
+            </div>
+            <button
+              type="button"
+              className="flex items-center gap-1.5 text-xs text-white hover:text-white transition-colors cursor-pointer bg-gradient-to-r from-[#594AE0]/90 to-[#AD0FF0]/90 hover:opacity-90 px-2.5 py-1.5 rounded-full"
+              onClick={() => setIsFlipped(false)}
+            >
+              <EyeOff className="w-3 h-3" />
+              Back
+            </button>
+          </div>
+
+          <div className="flex flex-col flex-grow p-5 gap-4 overflow-auto">
+            {/* Quota meter */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Upload Quota</span>
+                <span className="text-xs font-medium text-gray-700">{formatStorage(requiredStorage)} required</span>
               </div>
-              <button
-                type="button"
-                className="inline-flex items-center gap-1 text-sm text-blue-700 hover:text-blue-800 cursor-pointer"
-                onClick={() => setIsFlipped(false)}
-              >
-                <EyeOff className="w-4 h-4" />
-                Back
-              </button>
+
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      plan.storage > 0 ? (requiredStorage / plan.storage) * 100 : 0
+                    )}%`
+                  }}
+                />
+              </div>
+
+              <div className="flex justify-between mt-1">
+                <span className="text-[10px] text-gray-400">0</span>
+                <span className="text-[10px] text-gray-400">{formatStorage(plan.storage)} included</span>
+              </div>
             </div>
 
-            <div className="text-sm text-gray-700 space-y-2 leading-relaxed flex-grow">
-              <p>
-                Required quota: <span className="font-medium">{formatStorage(requiredStorage)}</span>
-              </p>
-              <p>
-                Business base is included first, then extra quota is added for overflow above 1.20 TB.
-              </p>
-              <p>
-                Enterprise total: base ${plan.baseCost.toFixed(2)} x {billingCycle === 'annual' ? '12' : '1'} + additional
-                ${plan.additionalCost.toFixed(2)} = <span className="font-medium">${plan.cost.toFixed(2)}</span>
-              </p>
-              <p className="text-xs text-gray-500 pt-2">
-                Enterprise is selected when regular-tier comparison is no longer sufficient.
-              </p>
+            {/* Cost breakdown */}
+            <div className="flex flex-col gap-2 flex-grow">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5">Cost Breakdown</p>
 
-              <div className="mt-2 p-2 rounded border border-blue-100 bg-blue-50 text-xs">
-                <p className="font-medium text-gray-900">Enterprise prepaid quota rates (after first 1.2 TB)</p>
-                <p>0 TB - 1.2 TB: $0.9375/GB</p>
-                <p>1.2 TB - 2.4 TB: $0.875/GB</p>
-                <p>2.4 TB - 5.0 TB: $0.8125/GB</p>
-                <p>5.0 TB - 10.0 TB: $0.75/GB</p>
-                {selectedTier ? (
-                  <p className="mt-1 font-medium text-blue-700">
-                    Selected tier: {selectedTier.label} at ${selectedTier.rate.toFixed(3)}/GB
-                  </p>
-                ) : (
-                  <p className="mt-1">Selected tier: no extra top-up needed</p>
-                )}
+              <div className="flex flex-col gap-1.5 text-sm">
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-500">Base plan / month</span>
+                  <span className="font-medium text-gray-800">${plan.baseCost.toFixed(2)}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-500">
+                    Extra quota
+                    <span className="ml-1 text-xs text-gray-400">({formatStorage(additionalGB)})</span>
+                  </span>
+                  <span className="font-medium text-gray-800">${plan.additionalCost.toFixed(2)}/yr</span>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-500">Base × 12 months</span>
+                  <span className="font-medium text-gray-800">${(plan.baseCost * 12).toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Total callout */}
+              <div className="mt-auto bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 border border-[#AD0FF0]/20 rounded-lg px-4 py-3 flex items-center justify-between">
+                <span className="text-sm font-semibold text-[#AD0FF0]">Annual Total</span>
+                <span className="text-lg font-bold text-[#AD0FF0]">
+                  ${(plan.baseCost * 12 + plan.additionalCost).toFixed(2)}
+                  <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
+                </span>
               </div>
             </div>
           </div>

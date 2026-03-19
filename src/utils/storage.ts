@@ -80,7 +80,7 @@ export const formatStorage = (gb: number): string => {
 };
 
 /**
- * Calculate pay-as-you-go additional quota cost (monthly add-on).
+ * Calculate pay-as-you-go additional quota cost (one-time yearly).
  *
  * Tier selection is based on the size of the additional top-up amount (additionalGB),
  * not on total required storage.

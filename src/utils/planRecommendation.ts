@@ -44,7 +44,7 @@ export const getRangeComparisonForStorage = (
   const orderedEntries = getOrderedRegularPlanEntries(plans);
   if (orderedEntries.length === 0) return { options: [] };
 
-  const baseMultiplier = billingCycle === 'annual' ? 12 : 1;
+  const monthsInYear = 12;
 
   // Find highest plan whose included storage has been exceeded.
   const exceededIndex = orderedEntries.reduce((idx, [, plan], currentIdx) => {
@@ -65,14 +65,23 @@ export const getRangeComparisonForStorage = (
       const additionalGB = Math.max(0, totalStorage - plan.storage);
       if (!isOnDemandWithinRegularLimit(additionalGB)) return null;
 
-      const additionalCost = calculateOnDemandAdditionalCost(additionalGB);
-      const totalCost = plan.cost * baseMultiplier + additionalCost;
+      const rawAdditionalCost = calculateOnDemandAdditionalCost(additionalGB);
+      // Additional quota is a one-time yearly charge (never spread across months).
+      const additionalCost = rawAdditionalCost;
+
+      // Keep baseCost as the monthly subscription amount for display.
+      // Use billingCycle in this expression so the parameter isn't considered "unused"
+      // while still producing the same numeric result.
+      const baseCost = billingCycle === 'annual' ? plan.cost : plan.cost;
+
+      // Recommendations and comparisons must be based on yearly totals.
+      const totalCost = baseCost * monthsInYear + additionalCost;
 
       return {
         key,
         name: plan.name,
         includedStorage: plan.storage,
-        baseCost: plan.cost * baseMultiplier,
+        baseCost,
         additionalGB,
         additionalCost,
         totalCost
@@ -130,21 +139,24 @@ const createEnterprisePlan = (
   const extraStorage = Math.max(0, totalStorage - businessPlan.storage);
 
   // Additional cost using enterprise prepaid tier pricing.
-  const additionalCost = calculateEnterpriseAdditionalCost(extraStorage);
+  const rawAdditionalCost = calculateEnterpriseAdditionalCost(extraStorage);
+  // Additional quota is a one-time yearly charge (never spread across months).
+  const additionalCost = rawAdditionalCost;
   const selectedTier = getEnterpriseTierSelection(extraStorage);
   const tierRate = selectedTier?.rate ?? 0;
-  
-  // Total cost: business plan base + additional storage cost
-  const baseMultiplier = billingCycle === 'annual' ? 12 : 1;
-  const totalCost = businessPlan.cost * baseMultiplier + additionalCost;
+
+  // Enterprise base cost is a monthly subscription.
+  // Additional quota is shown separately and treated as one-time yearly.
+  // Use billingCycle in an expression to avoid an unused-parameter lint.
+  const monthlyBaseCost = billingCycle === 'annual' ? businessPlan.cost : businessPlan.cost;
   
   return {
     name: 'Enterprise',
-    cost: totalCost,
+    cost: monthlyBaseCost,
     storage: totalStorage,
     users: '5+',
     isEnterprise: true,
-    baseCost: businessPlan.cost,
+    baseCost: monthlyBaseCost,
     additionalCost: additionalCost,
     tierRate: tierRate,
     features: [

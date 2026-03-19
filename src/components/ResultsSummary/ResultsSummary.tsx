@@ -3,14 +3,12 @@
  * Displays calculated storage requirements and recommended plan
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import type { BillingCycle, CalculationResult } from '../../types';
 import {
   calculateOnDemandAdditionalCost,
-  getEnterpriseTierSelection,
-  formatStorage,
-  getOnDemandTierSelection
+  formatStorage
 } from '../../utils/storage';
 import { getRangeComparisonForStorage } from '../../utils/planRecommendation';
 
@@ -25,12 +23,23 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
 
   const [whyOpen, setWhyOpen] = useState(false);
 
+  useEffect(() => {
+    if (!whyOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setWhyOpen(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [whyOpen]);
+
   const whyData = useMemo(() => {
     if (!recommendedPlan || result.totalStorage <= 0) return null;
 
     const requiredGB = result.totalStorage;
     const isEnterprise = (recommendedPlan as any).isEnterprise === true;
-    const baseMultiplier = billingCycle === 'annual' ? 12 : 1;
+    const monthsInYear = 12;
 
     if (isEnterprise) {
       const baseCost = (recommendedPlan as any).baseCost ?? recommendedPlan.cost;
@@ -42,10 +51,10 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
         requiredGB,
         recommended: {
           name: recommendedPlan.name,
-          baseCost: baseCost * baseMultiplier,
+          baseCost,
           additionalGB,
           additionalCost,
-          totalCost: baseCost * baseMultiplier + additionalCost
+          totalCost: baseCost * monthsInYear + additionalCost
         },
         alternatives: [] as Array<{
           name: string;
@@ -61,12 +70,13 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
     const recommendedOption = comparison.options.find((option) => option.name === recommendedPlan.name);
 
     const fallbackAdditionalGB = Math.max(0, requiredGB - recommendedPlan.storage);
-    const fallbackAdditionalCost = calculateOnDemandAdditionalCost(fallbackAdditionalGB);
-    const fallbackTotalCost = recommendedPlan.cost * baseMultiplier + fallbackAdditionalCost;
+    const fallbackRawAdditionalCost = calculateOnDemandAdditionalCost(fallbackAdditionalGB);
+    const fallbackAdditionalCost = fallbackRawAdditionalCost;
+    const fallbackTotalCost = recommendedPlan.cost * monthsInYear + fallbackAdditionalCost;
 
     const recommendedCostData = recommendedOption ?? {
       name: recommendedPlan.name,
-      baseCost: recommendedPlan.cost * baseMultiplier,
+      baseCost: recommendedPlan.cost,
       additionalGB: fallbackAdditionalGB,
       additionalCost: fallbackAdditionalCost,
       totalCost: fallbackTotalCost
@@ -110,14 +120,14 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
               <p className="text-xs text-gray-500">4K: {formatStorage(result.fourKStorage)}</p>
             </div>
           </div>
-          
+
           {/* Recommended Plan */}
-          <div className="bg-blue-50 rounded border border-blue-200 p-3">
+          <div className="bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 rounded border border-[#AD0FF0]/20 p-3">
             <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-blue-600" />
+              <CheckCircle className="w-4 h-4 text-black" />
               <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Recommended</span>
             </div>
-            
+
             <div className="flex items-baseline justify-between">
               <div>
                 <p className="text-lg font-semibold text-gray-900">{recommendedPlan.name}</p>
@@ -133,87 +143,75 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
               </div>
             </div>
 
+            {/* Why Recommended toggle */}
             <div className="mt-3">
               <button
                 type="button"
-                className="text-xs text-blue-700 underline hover:text-blue-800 cursor-pointer"
+                className="text-xs text-[#AD0FF0] underline hover:text-[#AD0FF0]/80 cursor-pointer"
                 onClick={() => setWhyOpen((v) => !v)}
               >
-                Why recommended?
+                {whyOpen ? 'Hide details' : 'Why recommended?'}
               </button>
 
               {whyOpen && whyData && (
-                <div className="mt-3 p-3 bg-white border border-gray-200 rounded">
-                  <div className="text-sm font-semibold text-gray-900 mb-2">
-                    Total cost with on-demand top-up
-                  </div>
-
-                  <div className="text-xs text-gray-700 leading-relaxed">
-                    <div>
-                      Required quota: <span className="font-medium">{formatStorage(whyData.requiredGB)}</span>
-                    </div>
-                    <div className="mt-1">
-                      {whyData.recommended.name}: base ${whyData.recommended.baseCost.toFixed(2)} + on-demand
-                      {whyData.recommended.additionalGB > 0
-                        ? ` ${formatStorage(whyData.recommended.additionalGB)} (${whyData.recommended.additionalCost.toFixed(2)})`
-                        : ' (no extra needed)'}
-                      = <span className="font-medium">${whyData.recommended.totalCost.toFixed(2)}</span>
-                    </div>
-
-                    <div className="mt-2">
-                      Compared within current range (current tier + next tier only).
-                    </div>
-
-                    <div className="mt-2 p-2 rounded border border-blue-100 bg-blue-50">
-                      <div className="font-medium text-gray-900">
-                        {(recommendedPlan as any).isEnterprise === true
-                          ? 'Enterprise prepaid quota rates (after first 1.2 TB)'
-                          : 'On-demand tier rates'}
+                <div
+                  className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+                  role="dialog"
+                  aria-modal="true"
+                  onMouseDown={() => setWhyOpen(false)}
+                >
+                  <div
+                    className="w-full max-w-lg rounded-lg border border-[#AD0FF0]/20 overflow-hidden bg-white shadow-xl"
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    {/* Panel header */}
+                    <div className="bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] px-4 py-2.5 flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-white">
+                          Why Recommended
+                        </p>
+                        <p className="text-sm font-semibold text-white mt-0.5">{whyData.recommended.name}</p>
                       </div>
-                      {(recommendedPlan as any).isEnterprise === true ? (
-                        <>
-                          <div className="mt-1">0 TB - 1.2 TB: $0.9375/GB</div>
-                          <div>1.2 TB - 2.4 TB: $0.875/GB</div>
-                          <div>2.4 TB - 5.0 TB: $0.8125/GB</div>
-                          <div>5.0 TB - 10.0 TB: $0.75/GB</div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="mt-1">0 TB - 1.2 TB: $1.110/GB</div>
-                          <div>1.2 TB - 2.4 TB: $1.00/GB</div>
-                          <div>2.4 TB - 5.0 TB: $0.90/GB</div>
-                          <div>5.0 TB - 10.0 TB: $0.82/GB</div>
-                        </>
-                      )}
-                      {(() => {
-                        const selectedTier =
-                          (recommendedPlan as any).isEnterprise === true
-                            ? getEnterpriseTierSelection(whyData.recommended.additionalGB)
-                            : getOnDemandTierSelection(whyData.recommended.additionalGB);
-                        if (!selectedTier) return <div className="mt-1">Selected tier: no extra top-up needed</div>;
-                        return (
-                          <div className="mt-1 font-medium text-blue-700">
-                            Selected tier: {selectedTier.label} at ${selectedTier.rate.toFixed(3)}/GB
-                          </div>
-                        );
-                      })()}
+                      <button
+                        type="button"
+                        className="text-xs text-white uppercase tracking-wider font-medium hover:text-white cursor-pointer"
+                        onClick={() => setWhyOpen(false)}
+                      >
+                        Close
+                      </button>
                     </div>
 
-                    {whyData.alternatives.length > 0 ? (
-                      whyData.alternatives.map((option) => (
-                        <div key={option.name} className="mt-2">
-                          {option.name}: base ${option.baseCost.toFixed(2)} + on-demand
-                          {option.additionalGB > 0
-                            ? ` ${formatStorage(option.additionalGB)} (${option.additionalCost.toFixed(2)})`
-                            : ' (no extra needed)'}
-                          = <span className="font-medium">${option.totalCost.toFixed(2)}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="mt-2 text-gray-500">
-                        No next-tier comparison is available for this range.
+                
+
+                    {/* Line items */}
+                    <div className="p-4 flex flex-col text-sm gap-1.5">
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span className="text-gray-500">Base plan / month</span>
+                        <span className="font-medium text-gray-800">${whyData.recommended.baseCost.toFixed(2)}</span>
                       </div>
-                    )}
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span className="text-gray-500">
+                          Extra quota
+                          <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
+                        </span>
+                        <span className="font-medium text-gray-800">${whyData.recommended.additionalCost.toFixed(2)}/yr</span>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span className="text-gray-500">Base × 12 months</span>
+                        <span className="font-medium text-gray-800">${(whyData.recommended.baseCost * 12).toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Annual total callout */}
+                    <div className="p-4 pt-0">
+                      <div className="bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 border border-[#AD0FF0]/20 rounded-lg px-4 py-3 flex items-center justify-between">
+                        <span className="text-sm font-semibold text-[#AD0FF0]">Annual Total</span>
+                        <span className="text-lg font-bold text-[#AD0FF0]">
+                          ${whyData.recommended.totalCost.toFixed(2)}
+                          <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
