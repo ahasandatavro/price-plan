@@ -25,7 +25,7 @@ export const useStorageCalculator = () => {
   const calculateStorage = (): CalculationResult => {
     const films = parseFloat(inputs.films);
     const duration = parseFloat(inputs.duration);
-    const fourKPercent = parseFloat(inputs.fourKPercent);
+    const fourKFilms = parseFloat(inputs.fourKPercent);
     const currentPlans = PLANS[billingCycle];
 
     // If inputs are empty or invalid, return default result with all plans but no recommendation
@@ -40,8 +40,10 @@ export const useStorageCalculator = () => {
     }
 
     // Calculate storage and find recommended plan
+    const normalizedFourKFilms = Math.max(0, Math.min(fourKFilms, films));
+    const fourKPercent = films > 0 ? (normalizedFourKFilms / films) * 100 : 0;
     const { total, hd, fourK } = calculateTotalStorage(films, duration, fourKPercent);
-    const recommendedPlan = findRecommendedPlan(total, currentPlans);
+    const recommendedPlan = findRecommendedPlan(total, currentPlans, billingCycle);
 
     return {
       totalStorage: total,

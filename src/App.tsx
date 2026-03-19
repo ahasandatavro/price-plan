@@ -21,7 +21,7 @@ const VideoStorageCalculator: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <Calculator className="w-8 h-8 text-purple-600" />
+            <Calculator className="w-8 h-8 text-purple-600 hidden sm:block" />
             <h1 className="text-3xl font-bold text-gray-800">Video Upload Quota Calculator</h1>
           </div>
           

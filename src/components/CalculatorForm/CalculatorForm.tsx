@@ -53,10 +53,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
     }
   };
 
-  const handlePercentChange = (value: string) => {
+  const handleFourKFilmsChange = (value: string) => {
     const numericValue = filterNumeric(value);
     const numValue = parseInt(numericValue) || 0;
-    const clampedValue = Math.min(100, Math.max(0, numValue));
+    const totalFilms = parseInt(inputs.films) || 0;
+    const maxFilms = totalFilms > 0 ? totalFilms : Number.MAX_SAFE_INTEGER;
+    const clampedValue = Math.min(maxFilms, Math.max(0, numValue));
     onInputChange('fourKPercent', clampedValue.toString());
   };
 
@@ -68,7 +70,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
         {/* Films per year */}
         <div>
           <label htmlFor="films" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <Film className="w-4 h-4 text-gray-500" />
+            <Film className="w-4 h-4 text-gray-500 hidden sm:block" />
             How many films do you shoot each year
           </label>
           <input
@@ -87,7 +89,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
         {/* Duration */}
         <div>
           <label htmlFor="duration" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <Clock className="w-4 h-4 text-gray-500" />
+            <Clock className="w-4 h-4 text-gray-500 hidden sm:block" />
             What is the total duration of each film (minutes)
           </label>
           <input
@@ -103,38 +105,33 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
           />
         </div>
 
-        {/* 4K Percentage */}
+        {/* 4K Films Count */}
         <div>
           <label htmlFor="fourk-percent" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-        
-            Percentage(%) of total film delivered in 4K 
+            How many films delivered in 4K
           </label>
-          <div className="relative">
-            <input
-              id="fourk-percent"
-              type="number"
-              value={inputs.fourKPercent}
-              onChange={(e) => handlePercentChange(e.target.value)}
-              onBlur={(e) => handlePercentChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onPaste={(e) => {
-                e.preventDefault();
-                const pastedText = e.clipboardData.getData('text');
-                const numericValue = filterNumeric(pastedText);
-                if (numericValue) {
-                  handlePercentChange(numericValue);
-                }
-              }}
-              placeholder="eg.100%"
-              min="0"
-              max="100"
-              className="w-full px-3 py-2 pr-8 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
-              %
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">Max 100%</p>
+          <input
+            id="fourk-percent"
+            type="number"
+            value={inputs.fourKPercent}
+            onChange={(e) => handleFourKFilmsChange(e.target.value)}
+            onBlur={(e) => handleFourKFilmsChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onPaste={(e) => {
+              e.preventDefault();
+              const pastedText = e.clipboardData.getData('text');
+              const numericValue = filterNumeric(pastedText);
+              if (numericValue) {
+                handleFourKFilmsChange(numericValue);
+              }
+            }}
+            placeholder="eg.20 films"
+            min="0"
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Enter how many of your total films are delivered in 4K
+          </p>
         </div>
       </div>
     </div>
