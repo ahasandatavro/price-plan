@@ -299,7 +299,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
       ) : (
         <div className="text-center py-5 md:py-16 lg:py-24">
           <p className="text-gray-500 text-sm">
-            Input values to show your upload quota and pricing
+          Input values to show your required upload quota and pricing
           </p>
         </div>
       )}
