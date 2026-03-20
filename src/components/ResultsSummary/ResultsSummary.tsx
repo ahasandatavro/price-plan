@@ -15,11 +15,22 @@ import { getRangeComparisonForStorage } from '../../utils/planRecommendation';
 interface ResultsSummaryProps {
   result: CalculationResult;
   billingCycle: BillingCycle;
+  sellContent: boolean;
 }
 
-export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingCycle }) => {
-  const hasData = result.totalStorage > 0 && result.recommendedPlan;
-  const recommendedPlan = result.recommendedPlan;
+export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingCycle, sellContent }) => {
+  const calcRecommendedPlan = result.recommendedPlan;
+  const shouldBlockStarter = billingCycle === 'annual' && sellContent;
+
+  const recommendedPlan =
+    shouldBlockStarter &&
+    calcRecommendedPlan &&
+    !((calcRecommendedPlan as any)?.isEnterprise === true) &&
+    calcRecommendedPlan.name === 'Starter'
+      ? ((result.allPlans as any).growth ?? calcRecommendedPlan)
+      : calcRecommendedPlan;
+
+  const hasData = result.totalStorage > 0 && recommendedPlan;
   const isEnterprise = (recommendedPlan as any)?.isEnterprise === true;
 
   const [whyOpen, setWhyOpen] = useState(false);
@@ -111,81 +122,75 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
       {hasData && recommendedPlan ? (
         <>
           {/* Storage Summary */}
-          <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-            <div>
-              <p className="text-xs text-gray-500 mb-1">Total Required Upload Quota</p>
-              <p className="text-2xl font-semibold text-gray-900">{formatStorage(result.totalStorage)}</p>
+          {!whyOpen && (
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Total Required Upload Quota</p>
+                <p className="text-2xl font-semibold text-gray-900">{formatStorage(result.totalStorage)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500">HD: {formatStorage(result.hdStorage)}</p>
+                <p className="text-xs text-gray-500">4K: {formatStorage(result.fourKStorage)}</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-500">HD: {formatStorage(result.hdStorage)}</p>
-              <p className="text-xs text-gray-500">4K: {formatStorage(result.fourKStorage)}</p>
-            </div>
-          </div>
+          )}
 
           {/* Recommended Plan */}
           <div className="bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 rounded border border-[#AD0FF0]/20 p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-black" />
-              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Recommended</span>
-            </div>
+            {!whyOpen ? (
+              <>
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-4 h-4 text-black" />
+                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Recommended</span>
+                </div>
 
-            <div className="flex items-baseline justify-between">
-              <div>
-                <p className="text-lg font-semibold text-gray-900">{recommendedPlan.name}</p>
-                <p className="text-xs text-gray-600 mt-0.5">
-                  {formatStorage(recommendedPlan.storage)}
-                  {' • '}
-                  {userValue} {userWord}
-                </p>
-              </div>
-              <div className="text-right">
-                {isEnterprise ? (
-                  <>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      ${(
-                        (recommendedPlan as any).baseCost * 12 + (recommendedPlan as any).additionalCost
-                      ).toFixed(2)}
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">{recommendedPlan.name}</p>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      {formatStorage(recommendedPlan.storage)}
+                      {' • '}
+                      {userValue} {userWord}
                     </p>
-                    <p className="text-xs text-gray-600">/year</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      ${billingCycle === 'annual' ? Math.round(recommendedPlan.cost) : recommendedPlan.cost.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-gray-600">/month</p>
-                  </>
-                )}
-              </div>
-            </div>
+                  </div>
+                  <div className="text-right">
+                    {isEnterprise ? (
+                      <>
+                        <p className="text-2xl font-semibold text-gray-900">
+                          ${(
+                            (recommendedPlan as any).baseCost * 12 + (recommendedPlan as any).additionalCost
+                          ).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-600">/year</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-2xl font-semibold text-gray-900">
+                          ${billingCycle === 'annual' ? Math.round(recommendedPlan.cost) : recommendedPlan.cost.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-600">/month</p>
+                      </>
+                    )}
+                  </div>
+                </div>
 
-            {/* Why Recommended toggle */}
-            <div className="mt-3">
-              <button
-                type="button"
-                className="text-xs text-[#AD0FF0] underline hover:text-[#AD0FF0]/80 cursor-pointer"
-                onClick={() => setWhyOpen((v) => !v)}
-              >
-                {whyOpen ? 'Hide details' : 'Why recommended?'}
-              </button>
-
-              {whyOpen && whyData && (
-                <div
-                  className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
-                  role="dialog"
-                  aria-modal="true"
-                  onMouseDown={() => setWhyOpen(false)}
-                >
-                  <div
-                    className="w-full max-w-lg rounded-lg border border-[#AD0FF0]/20 overflow-hidden bg-white shadow-xl"
-                    onMouseDown={(e) => e.stopPropagation()}
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    className="text-xs text-[#AD0FF0] underline hover:text-[#AD0FF0]/80 cursor-pointer"
+                    onClick={() => setWhyOpen(true)}
                   >
-                    {/* Panel header */}
+                    Why recommended?
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {whyData ? (
+                  <div className="rounded-lg border border-[#AD0FF0]/20 overflow-hidden bg-white shadow-xl">
                     <div className="bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] px-4 py-2.5 flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-white">
-                          Why Recommended
-                        </p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-white">Why Recommended</p>
                         <p className="text-sm font-semibold text-white mt-0.5">{whyData.recommended.name}</p>
                       </div>
                       <button
@@ -193,20 +198,15 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                         className="text-xs text-white uppercase tracking-wider font-medium hover:text-white cursor-pointer"
                         onClick={() => setWhyOpen(false)}
                       >
-                        Close
+                        Back
                       </button>
                     </div>
 
-                
-
-                    {/* Line items */}
                     <div className="p-4 flex flex-col text-sm gap-1.5">
                       {isEnterprise ? (
                         <>
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-500">
-                              Business base (yearly)
-                            </span>
+                            <span className="text-gray-500">Business base (yearly)</span>
                             <span className="font-medium text-gray-800">
                               ${(whyData.recommended.baseCost * 12).toFixed(2)}
                             </span>
@@ -214,7 +214,9 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
                             <span className="text-gray-500">
                               Pre-paid quota
-                              <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
+                              <span className="ml-1 text-xs text-gray-400">
+                                ({formatStorage(whyData.recommended.additionalGB)})
+                              </span>
                             </span>
                             <span className="font-medium text-gray-800">
                               ${whyData.recommended.additionalCost.toFixed(2)}/yr
@@ -235,7 +237,9 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
                             <span className="text-gray-500">
                               Pay as you go
-                              <span className="ml-1 text-xs text-gray-400">({formatStorage(whyData.recommended.additionalGB)})</span>
+                              <span className="ml-1 text-xs text-gray-400">
+                                ({formatStorage(whyData.recommended.additionalGB)})
+                              </span>
                             </span>
                             <span className="font-medium text-gray-800">
                               ${whyData.recommended.additionalCost.toFixed(2)}/yr
@@ -253,7 +257,6 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                       )}
                     </div>
 
-                    {/* Totals callout */}
                     <div className="p-4 pt-0">
                       <div className="bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 border border-[#AD0FF0]/20 rounded-lg px-4 py-3 flex items-center justify-between">
                         {billingCycle === 'monthly' ? (
@@ -274,7 +277,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           </>
                         )}
                       </div>
-                      {/* CTA */}
+
                       <a
                         href="https://mediazilla.com/onboarding"
                         target="_blank"
@@ -286,9 +289,11 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                       </a>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="text-sm text-gray-500 p-4">Details unavailable.</div>
+                )}
+              </>
+            )}
           </div>
         </>
       ) : (

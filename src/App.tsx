@@ -37,7 +37,7 @@ const VideoStorageCalculator: React.FC = () => {
 
           <BillingToggle billingCycle={billingCycle} onToggle={setBillingCycle} />
 
-          {result && <ResultsSummary result={result} billingCycle={billingCycle} />}
+          {result && <ResultsSummary result={result} billingCycle={billingCycle} sellContent={sellContent} />}
         </div>
 
         {result && <PlansGrid result={result} billingCycle={billingCycle} sellContent={sellContent} />}

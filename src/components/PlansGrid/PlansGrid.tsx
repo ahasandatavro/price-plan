@@ -53,6 +53,15 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   };
 
   const hasCalculation = result.totalStorage > 0 && result.recommendedPlan !== null;
+  const calcRecommendedPlan = result.recommendedPlan;
+  const shouldBlockStarter = billingCycle === 'annual' && sellContent;
+  const uiRecommendedPlan =
+    shouldBlockStarter &&
+    calcRecommendedPlan &&
+    !isEnterprisePlan(calcRecommendedPlan) &&
+    calcRecommendedPlan.name === 'Starter'
+      ? ((result.allPlans as any).growth ?? calcRecommendedPlan)
+      : calcRecommendedPlan;
   const rangeComparison = hasCalculation
     ? getRangeComparisonForStorage(result.totalStorage, result.allPlans, billingCycle)
     : { options: [] };
@@ -63,16 +72,16 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
     // Check if planA is recommended
     const isPlanARecommended = 
       hasCalculation &&
-      result.recommendedPlan !== null &&
-      planA.name === result.recommendedPlan.name && 
-      !isEnterprisePlan(result.recommendedPlan);
+      uiRecommendedPlan !== null &&
+      planA.name === uiRecommendedPlan.name &&
+      !isEnterprisePlan(uiRecommendedPlan);
     
     // Check if planB is recommended
     const isPlanBRecommended = 
       hasCalculation &&
-      result.recommendedPlan !== null &&
-      planB.name === result.recommendedPlan.name && 
-      !isEnterprisePlan(result.recommendedPlan);
+      uiRecommendedPlan !== null &&
+      planB.name === uiRecommendedPlan.name &&
+      !isEnterprisePlan(uiRecommendedPlan);
     
     // Recommended plan should come first
     if (isPlanARecommended && !isPlanBRecommended) return -1;
@@ -83,11 +92,11 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   // Prepare all plans for carousel (including enterprise if recommended)
   const allPlansForCarousel: Array<{ type: 'enterprise' | 'regular'; key: string; plan: any }> = [];
   
-  if (hasCalculation && result.recommendedPlan && isEnterprisePlan(result.recommendedPlan)) {
+  if (hasCalculation && uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan)) {
     allPlansForCarousel.push({
       type: 'enterprise',
       key: 'enterprise',
-      plan: result.recommendedPlan
+      plan: uiRecommendedPlan
     });
   }
 
@@ -155,9 +164,9 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
 
               const isRecommended = 
                 hasCalculation &&
-                result.recommendedPlan !== null &&
-                plan.name === result.recommendedPlan.name && 
-                !isEnterprisePlan(result.recommendedPlan);
+                uiRecommendedPlan !== null &&
+                plan.name === uiRecommendedPlan.name &&
+                !isEnterprisePlan(uiRecommendedPlan);
               const onDemandAdditionalGB = hasCalculation ? Math.max(0, result.totalStorage - plan.storage) : 0;
               const meetsRequirement = !hasCalculation || isOnDemandWithinRegularLimit(onDemandAdditionalGB);
               const isStarterPlan = plan.name === 'Starter';
