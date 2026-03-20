@@ -15,9 +15,10 @@ import { getRangeComparisonForStorage } from '../../utils/planRecommendation';
 interface PlansGridProps {
   result: CalculationResult;
   billingCycle: BillingCycle;
+  sellContent: boolean;
 }
 
-export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) => {
+export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sellContent }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     align: 'start',
     slidesToScroll: 1,
@@ -159,6 +160,9 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
                 !isEnterprisePlan(result.recommendedPlan);
               const onDemandAdditionalGB = hasCalculation ? Math.max(0, result.totalStorage - plan.storage) : 0;
               const meetsRequirement = !hasCalculation || isOnDemandWithinRegularLimit(onDemandAdditionalGB);
+              const isStarterPlan = plan.name === 'Starter';
+              const contentSellBlocked = billingCycle === 'annual' && sellContent && isStarterPlan;
+              const contentSellTooltip = 'Content sell feature is not available in this package.';
 
               return (
                 <div key={key} className="flex-[0_0_100%] md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.33rem)] min-w-0">
@@ -169,6 +173,8 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle }) =>
                     meetsRequirement={meetsRequirement}
                     requiredStorage={result.totalStorage}
                     comparisonOptions={isRecommended ? rangeComparison.options : []}
+                    isContentSellBlocked={contentSellBlocked}
+                    contentSellTooltip={contentSellTooltip}
                   />
                 </div>
               );

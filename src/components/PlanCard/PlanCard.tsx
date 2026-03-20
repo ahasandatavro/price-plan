@@ -21,6 +21,8 @@ interface PlanCardProps {
   billingCycle: BillingCycle;
   isRecommended: boolean;
   meetsRequirement: boolean;
+  isContentSellBlocked?: boolean;
+  contentSellTooltip?: string;
   requiredStorage?: number;
   comparisonOptions?: WhyRecommendationOption[];
 }
@@ -30,11 +32,14 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   billingCycle,
   isRecommended,
   meetsRequirement,
+  isContentSellBlocked = false,
+  contentSellTooltip,
   requiredStorage = 0,
   comparisonOptions = []
 }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
   const selectedOption = comparisonOptions.find((option) => option.name === plan.name);
+  const canGetStarted = meetsRequirement && !isContentSellBlocked;
 
   React.useEffect(() => {
     if (!isRecommended) {
@@ -124,13 +129,19 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                 </button>
               )}
 
-              {!meetsRequirement && (
+              {!meetsRequirement && !isContentSellBlocked && (
                 <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
                   Insufficient upload quota for your needs
                 </div>
               )}
 
-              {meetsRequirement ? (
+              {isContentSellBlocked && (
+                <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                  Content sell feature is not available in this package.
+                </div>
+              )}
+
+              {canGetStarted ? (
                 <a
                   href="https://mediazilla.com/onboarding"
                   target="_blank"
@@ -147,6 +158,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                 <button
                   className="w-full py-3 rounded font-medium text-sm transition-colors bg-gray-200 text-gray-500 cursor-not-allowed"
                   disabled
+                  title={isContentSellBlocked ? contentSellTooltip : undefined}
                 >
                   Unavailable
                 </button>

@@ -10,9 +10,11 @@ import type { StorageInputs } from '../../types';
 interface CalculatorFormProps {
   inputs: StorageInputs;
   onInputChange: (field: keyof StorageInputs, value: string) => void;
+  sellContent: boolean;
+  onSellContentChange: (value: boolean) => void;
 }
 
-export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputChange }) => {
+export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputChange, sellContent, onSellContentChange }) => {
   // Filter out non-numeric characters
   const filterNumeric = (value: string): string => {
     return value.replace(/[^0-9]/g, '');
@@ -132,6 +134,37 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
           <p className="text-xs text-gray-500 mt-1">
             Enter how many of your total films are delivered in 4K
           </p>
+        </div>
+
+        {/* Sell content (Yes/No buttons) */}
+        <div className="lg:col-span-1 xl:col-span-1">
+          <div className="text-sm font-medium text-gray-700 mb-2">Do you want to sell content?</div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              className={`flex-1 py-2 rounded font-medium text-sm transition-colors border cursor-pointer ${
+                sellContent
+                  ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white border-transparent'
+                  : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+              }`}
+              aria-pressed={sellContent}
+              onClick={() => onSellContentChange(true)}
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              className={`flex-1 py-2 rounded font-medium text-sm transition-colors border cursor-pointer ${
+                !sellContent
+                  ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white border-transparent'
+                  : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+              }`}
+              aria-pressed={!sellContent}
+              onClick={() => onSellContentChange(false)}
+            >
+              No
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -15,6 +15,7 @@ import {
 
 const VideoStorageCalculator: React.FC = () => {
   const { inputs, updateInput, billingCycle, setBillingCycle, result } = useStorageCalculator();
+  const [sellContent, setSellContent] = React.useState(false);
 
   return (
     <div className="min-h-screen p-4">
@@ -27,14 +28,19 @@ const VideoStorageCalculator: React.FC = () => {
           
           <p className="text-gray-600 mb-8">Answer three simple questions to find your perfect plan</p>
 
-          <CalculatorForm inputs={inputs} onInputChange={updateInput} />
+          <CalculatorForm
+            inputs={inputs}
+            onInputChange={updateInput}
+            sellContent={sellContent}
+            onSellContentChange={setSellContent}
+          />
 
           <BillingToggle billingCycle={billingCycle} onToggle={setBillingCycle} />
 
           {result && <ResultsSummary result={result} billingCycle={billingCycle} />}
         </div>
 
-        {result && <PlansGrid result={result} billingCycle={billingCycle} />}
+        {result && <PlansGrid result={result} billingCycle={billingCycle} sellContent={sellContent} />}
       </div>
     </div>
   );
