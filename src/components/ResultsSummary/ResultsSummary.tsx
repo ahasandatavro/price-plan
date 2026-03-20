@@ -245,7 +245,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                             <div className="flex items-center justify-between py-2 border-b border-gray-100">
                               <span className="text-gray-500">Annual billing cycle</span>
                               <span className="font-medium text-gray-800">
-                                ${(whyData.recommended.baseCost * 12).toFixed(0)}
+                                ${(whyData.recommended.baseCost * 12 + whyData.recommended.additionalCost).toFixed(0)}
                               </span>
                             </div>
                           )}
