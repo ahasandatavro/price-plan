@@ -150,7 +150,9 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                   </>
                 ) : (
                   <>
-                    <p className="text-2xl font-semibold text-gray-900">${recommendedPlan.cost.toFixed(2)}</p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      ${billingCycle === 'annual' ? Math.round(recommendedPlan.cost) : recommendedPlan.cost.toFixed(2)}
+                    </p>
                     <p className="text-xs text-gray-600">/month</p>
                   </>
                 )}
@@ -224,7 +226,10 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
                             <span className="text-gray-500">Base plan / month</span>
                             <span className="font-medium text-gray-800">
-                              ${whyData.recommended.baseCost.toFixed(2)}
+                              $
+                              {billingCycle === 'annual'
+                                ? Math.round(whyData.recommended.baseCost)
+                                : whyData.recommended.baseCost.toFixed(2)}
                             </span>
                           </div>
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
@@ -240,7 +245,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                             <div className="flex items-center justify-between py-2 border-b border-gray-100">
                               <span className="text-gray-500">Annual billing cycle</span>
                               <span className="font-medium text-gray-800">
-                                ${(whyData.recommended.baseCost * 12).toFixed(2)}
+                                ${(whyData.recommended.baseCost * 12).toFixed(0)}
                               </span>
                             </div>
                           )}
@@ -263,7 +268,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           <>
                             <span className="text-sm font-semibold text-[#AD0FF0]">Pay today</span>
                             <span className="text-lg font-bold text-[#AD0FF0]">
-                              ${(whyData.recommended.baseCost * 12).toFixed(2)}
+                              ${(whyData.recommended.baseCost * 12).toFixed(0)}
                               <span className="text-xs font-medium text-[#AD0FF0]/70">/yr</span>
                             </span>
                           </>

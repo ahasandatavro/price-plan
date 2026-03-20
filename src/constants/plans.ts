@@ -51,7 +51,9 @@ export const PLANS: Plans = {
   annual: {
     starter: { 
       name: 'Starter', 
-      cost: 21, 
+      // Keep underlying model as monthly subscription price;
+      // annual display uses cost * 12.
+      cost: 20.75, 
       storage: 50, 
       users: 1,
       features: [
@@ -65,7 +67,8 @@ export const PLANS: Plans = {
     },
     growth: { 
       name: 'Growth', 
-      cost: 37, 
+      // 36.5 * 12 = 438
+      cost: 36.5, 
       storage: 100, 
       users: 1,
       features: [
