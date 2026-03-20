@@ -175,13 +175,13 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                 </div>
 
                 <div className="mt-3">
-                  <button
+                  {/* <button
                     type="button"
                     className="text-xs text-[#AD0FF0] underline hover:text-[#AD0FF0]/80 cursor-pointer"
                     onClick={() => setWhyOpen(true)}
                   >
                     Why recommended?
-                  </button>
+                  </button> */}
                 </div>
               </>
             ) : (
@@ -299,7 +299,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
       ) : (
         <div className="text-center py-5 md:py-16 lg:py-24">
           <p className="text-gray-500 text-sm">
-          Input values to show your required upload quota and pricing
+            Input values to show your required upload quota and pricing
           </p>
         </div>
       )}
