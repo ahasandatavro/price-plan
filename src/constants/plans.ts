@@ -137,6 +137,24 @@ export const PAY_AS_YOU_GO_PER_GB_BY_PLAN: Record<string, number> = {
   Business: 1
 } as const;
 
+/** Minimum total required storage (GB) to qualify for Enterprise (2.4 TB). */
+export const ENTERPRISE_MIN_TOTAL_GB = 2.4 * 1024; // 2457.6 GB
+
+/**
+ * Business (annual) is capped at this yearly total in the product model.
+ * If the computed Business annual total is this value or higher, recommend Enterprise instead.
+ */
+export const BUSINESS_ANNUAL_MAX_TOTAL_USD = 2174;
+
+/** Recommend Enterprise when Business annual total (base + on-demand) is strictly above the cap. */
+export const ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD = BUSINESS_ANNUAL_MAX_TOTAL_USD + 1; // 2175
+
+/** Fixed Enterprise annual subscription before pre-paid add-ons. */
+export const ENTERPRISE_ANNUAL_BASE_USD = 1125;
+
+/** Enterprise CTA — https://mediazilla.com/contact-us */
+export const MEDIAZILLA_ENTERPRISE_CONTACT_URL = 'https://mediazilla.com/contact-us';
+
 // Regular-plan on-demand availability is capped at 10.0TB additional quota.
 export const ON_DEMAND_MAX_ADDITIONAL_GB = 10240;
 

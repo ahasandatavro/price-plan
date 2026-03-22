@@ -14,7 +14,9 @@ export interface Plan {
 
 export interface EnterprisePlan extends Plan {
   isEnterprise: true;
+  /** Monthly equivalent of fixed annual base (e.g. $1,125/yr ÷ 12). */
   baseCost: number;
+  /** Pre-paid quota charges (annual) beyond included 1.2 TB. */
   additionalCost: number;
   tierRate: number;
 }

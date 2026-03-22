@@ -116,19 +116,19 @@ export const getPayAsYouGoTierInfo = (planName: string): OnDemandTierSelection |
   };
 };
 
+/** Pre-paid quota after first 1.2 TB included (additional GB beyond Business storage). */
 const ENTERPRISE_PREPAID_TIER_RATES = [
-  { min: 0, max: 1228.8, rate: 0.9375 },
-  { min: 1228.8, max: 2457.6, rate: 0.875 },
-  { min: 2457.6, max: 5120, rate: 0.8125 },
-  { min: 5120, max: 10240, rate: 0.75 }
+  { min: 0, max: 1228.8, rate: 0.875 }, // 0 TB - 1.2 TB additional
+  { min: 1228.8, max: 5120, rate: 0.8125 } // 1.2 TB - 5 TB additional
 ] as const;
 
-const ENTERPRISE_TIER_LABELS = [
-  '0 TB - 1.2 TB',
-  '1.2 TB - 2.4 TB',
-  '2.4 TB - 5.0 TB',
-  '5.0 TB - 10.0 TB'
+const ENTERPRISE_PREPAID_LABELS = [
+  '0 TB - 1.2 TB (pre-paid)',
+  '1.2 TB - 5 TB (pre-paid)',
+  '5.1 TB+ (pre-paid)'
 ] as const;
+
+const ENTERPRISE_PREPAID_OVERFLOW_RATE = 0.75;
 
 export interface EnterpriseTierSelection {
   label: string;
@@ -136,8 +136,7 @@ export interface EnterpriseTierSelection {
 }
 
 /**
- * Calculate enterprise prepaid additional quota cost beyond the included Business 1.2 TB.
- * Tier selection is based on additionalGB.
+ * Calculate enterprise **pre-paid** additional quota cost beyond the included 1.2 TB.
  */
 export const calculateEnterpriseAdditionalCost = (additionalGB: number): number => {
   const safeAdditional = Math.max(0, additionalGB);
@@ -158,34 +157,34 @@ export const calculateEnterpriseAdditionalCost = (additionalGB: number): number 
   }
 
   if (remaining > 0) {
-    const lastRate = ENTERPRISE_PREPAID_TIER_RATES[ENTERPRISE_PREPAID_TIER_RATES.length - 1]?.rate ?? 0;
-    cost += remaining * lastRate;
+    cost += remaining * ENTERPRISE_PREPAID_OVERFLOW_RATE;
   }
 
   return Math.max(0, cost);
 };
 
 /**
- * Get enterprise prepaid tier selected by additionalGB above business.
+ * Primary pre-paid tier label/rate for display (by additional GB).
  */
 export const getEnterpriseTierSelection = (additionalGB: number): EnterpriseTierSelection | null => {
   const safeAdditional = Math.max(0, additionalGB);
   if (safeAdditional <= 0) return null;
 
-  for (let index = 0; index < ENTERPRISE_PREPAID_TIER_RATES.length; index += 1) {
-    const tier = ENTERPRISE_PREPAID_TIER_RATES[index];
-    if (safeAdditional <= tier.max) {
-      return {
-        label: ENTERPRISE_TIER_LABELS[index],
-        rate: tier.rate
-      };
-    }
+  if (safeAdditional <= ENTERPRISE_PREPAID_TIER_RATES[0].max) {
+    return {
+      label: ENTERPRISE_PREPAID_LABELS[0],
+      rate: ENTERPRISE_PREPAID_TIER_RATES[0].rate
+    };
   }
-
-  const lastTier = ENTERPRISE_PREPAID_TIER_RATES[ENTERPRISE_PREPAID_TIER_RATES.length - 1];
+  if (safeAdditional <= ENTERPRISE_PREPAID_TIER_RATES[1].max) {
+    return {
+      label: ENTERPRISE_PREPAID_LABELS[1],
+      rate: ENTERPRISE_PREPAID_TIER_RATES[1].rate
+    };
+  }
   return {
-    label: ENTERPRISE_TIER_LABELS[ENTERPRISE_TIER_LABELS.length - 1],
-    rate: lastTier?.rate ?? 0
+    label: ENTERPRISE_PREPAID_LABELS[2],
+    rate: ENTERPRISE_PREPAID_OVERFLOW_RATE
   };
 };
 

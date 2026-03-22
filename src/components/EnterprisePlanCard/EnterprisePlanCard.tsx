@@ -6,6 +6,7 @@
 import React from 'react';
 import { Check, Users, Database, Eye, EyeOff } from 'lucide-react';
 import type { EnterprisePlan, BillingCycle } from '../../types';
+import { MEDIAZILLA_ENTERPRISE_CONTACT_URL } from '../../constants/plans';
 import { formatStorage } from '../../utils/storage';
 
 interface EnterprisePlanCardProps {
@@ -91,7 +92,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
               </button>
 
               <a
-                href="https://mediazilla.com/onboarding"
+                href={MEDIAZILLA_ENTERPRISE_CONTACT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3 rounded font-medium text-sm transition-colors bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer block text-center"
@@ -150,7 +151,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
 
               <div className="flex flex-col gap-1.5 text-sm">
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-500">Business base (yearly)</span>
+                  <span className="text-gray-500">Enterprise base (annual)</span>
                   <span className="font-medium text-gray-800">${baseAnnualCost.toFixed(2)}</span>
                 </div>
 

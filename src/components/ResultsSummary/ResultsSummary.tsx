@@ -10,7 +10,16 @@ import {
   calculateOnDemandAdditionalCost,
   formatStorage
 } from '../../utils/storage';
-import { getRangeComparisonForStorage } from '../../utils/planRecommendation';
+import {
+  getBusinessAnnualTotalForStorage,
+  getRangeComparisonForStorage
+} from '../../utils/planRecommendation';
+import {
+  ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD,
+  ENTERPRISE_MIN_TOTAL_GB,
+  MEDIAZILLA_ENTERPRISE_CONTACT_URL,
+  PLANS
+} from '../../constants/plans';
 
 interface ResultsSummaryProps {
   result: CalculationResult;
@@ -59,6 +68,10 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
       const businessPlan = (result.allPlans as any).business;
       const additionalGB = Math.max(0, requiredGB - (businessPlan?.storage ?? requiredGB));
 
+      const businessAnnualPayAsYouGo = getBusinessAnnualTotalForStorage(requiredGB, PLANS);
+      const hitStorageMinimum = requiredGB >= ENTERPRISE_MIN_TOTAL_GB;
+      const hitBusinessAnnualCap = businessAnnualPayAsYouGo >= ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD;
+
       return {
         requiredGB,
         recommended: {
@@ -67,6 +80,11 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
           additionalGB,
           additionalCost,
           totalCost: baseCost * monthsInYear + additionalCost
+        },
+        enterpriseContext: {
+          businessAnnualPayAsYouGo,
+          hitStorageMinimum,
+          hitBusinessAnnualCap
         },
         alternatives: [] as Array<{
           name: string;
@@ -205,8 +223,35 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                     <div className="p-4 flex flex-col text-sm gap-1.5">
                       {isEnterprise ? (
                         <>
+                          {'enterpriseContext' in whyData && whyData.enterpriseContext && (
+                            <div className="text-xs text-gray-700 bg-amber-50 border border-amber-100 rounded px-3 py-2.5 mb-1 space-y-1.5">
+                              <p className="font-medium text-amber-900">Why Enterprise (not Business)?</p>
+                              {whyData.enterpriseContext.hitBusinessAnnualCap && (
+                                <>
+                                  <p>
+                                    The <strong>${ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD}</strong> limit is for
+                                    what <strong>Business would cost per year</strong> (annual base + $1/GB
+                                    pay-as-you-go on extra quota) — not for your Enterprise pre-paid total.
+                                  </p>
+                                  <p>
+                                    Business equivalent:{' '}
+                                    <strong>
+                                      ${whyData.enterpriseContext.businessAnnualPayAsYouGo.toFixed(2)}/yr
+                                    </strong>{' '}
+                                    (≥ ${ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD}, so Enterprise applies).
+                                  </p>
+                                </>
+                              )}
+                              {whyData.enterpriseContext.hitStorageMinimum && (
+                                <p>
+                                  Your required quota is at or above the Enterprise minimum (
+                                  {formatStorage(ENTERPRISE_MIN_TOTAL_GB)} total).
+                                </p>
+                              )}
+                            </div>
+                          )}
                           <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-500">Business base (yearly)</span>
+                            <span className="text-gray-500">Enterprise base (annual)</span>
                             <span className="font-medium text-gray-800">
                               ${(whyData.recommended.baseCost * 12).toFixed(2)}
                             </span>
@@ -279,7 +324,11 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                       </div>
 
                       <a
-                        href="https://mediazilla.com/onboarding"
+                        href={
+                          isEnterprise
+                            ? MEDIAZILLA_ENTERPRISE_CONTACT_URL
+                            : 'https://mediazilla.com/onboarding'
+                        }
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-3 w-full py-3 px-4 rounded font-medium text-sm transition-colors bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer block text-center"

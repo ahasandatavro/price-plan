@@ -4,6 +4,11 @@
 
 import type { BillingCycle, Plan, EnterprisePlan, Plans } from '../types';
 import {
+  ENTERPRISE_MIN_TOTAL_GB,
+  ENTERPRISE_ANNUAL_BASE_USD,
+  ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD
+} from '../constants/plans';
+import {
   calculateEnterpriseAdditionalCost,
   calculateOnDemandAdditionalCost,
   formatStorage,
@@ -98,6 +103,22 @@ export const getRangeComparisonForStorage = (
 };
 
 /**
+ * Annual Business total (base + pay-as-you-go on extra quota), using annual catalog.
+ * Used to decide Enterprise when this exceeds the Business yearly cap (see constants).
+ */
+export const getBusinessAnnualTotalForStorage = (totalStorage: number, plans: Plans): number => {
+  const businessPlan = plans.annual.business;
+  const additionalGB = Math.max(0, totalStorage - businessPlan.storage);
+  const additionalCost = calculateOnDemandAdditionalCost(additionalGB, businessPlan.name);
+  return businessPlan.cost * 12 + additionalCost;
+};
+
+const shouldRecommendEnterprise = (totalStorage: number, plans: Plans): boolean => {
+  if (totalStorage >= ENTERPRISE_MIN_TOTAL_GB) return true;
+  return getBusinessAnnualTotalForStorage(totalStorage, plans) >= ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD;
+};
+
+/**
  * Find the best matching plan for given storage requirements
  */
 export const findRecommendedPlan = (
@@ -107,10 +128,8 @@ export const findRecommendedPlan = (
 ): Plan | EnterprisePlan => {
   const currentPlans = plans[billingCycle];
 
-  // Business includes up to 1.2 TB. Anything above is Enterprise.
-  if (totalStorage > currentPlans.business.storage) {
-    // Enterprise base always uses the annual business tier so the
-    // calculation shown matches the yearly toggle in both modes.
+  // Enterprise: 2.4 TB+ total storage, OR Business annual total would exceed $2,174 (i.e. >= $2,175).
+  if (shouldRecommendEnterprise(totalStorage, plans)) {
     return createEnterprisePlan(totalStorage, plans.annual.business);
   }
 
@@ -119,10 +138,9 @@ export const findRecommendedPlan = (
     ? (currentPlans as unknown as Record<string, Plan>)[comparison.recommended.key]
     : null;
 
-  // If no regular plan can cover the requirement within the regular on-demand limit,
-  // fall back to an enterprise plan with custom pricing.
+  // If no regular plan can cover the requirement within the regular on-demand limit.
   if (!bestPlan) {
-    return createEnterprisePlan(totalStorage, plans.annual.business);
+    return currentPlans.business;
   }
 
   return bestPlan;
@@ -130,29 +148,21 @@ export const findRecommendedPlan = (
 
 /**
  * Create an enterprise plan with custom pricing
- * 
- * Pricing structure:
- * - Base cost: Business plan cost (covers up to 1.2 TB = 1228.8 GB)
- * - Additional storage: Charged using enterprise prepaid quota tiers
- *   beyond the included Business 1.2 TB.
+ *
+ * - Annual base: ENTERPRISE_ANNUAL_BASE_USD ($1,125/yr) + pre-paid quota charges
+ * - Pre-paid rates apply to storage beyond included 1.2 TB (Business).
  */
 const createEnterprisePlan = (
   totalStorage: number,
   businessPlan: Plan
 ): EnterprisePlan => {
-  // Calculate additional storage beyond business plan (1.2 TB = 1228.8 GB)
   const extraStorage = Math.max(0, totalStorage - businessPlan.storage);
 
-  // Additional cost using enterprise prepaid tier pricing.
-  const rawAdditionalCost = calculateEnterpriseAdditionalCost(extraStorage);
-  // Additional quota is a one-time yearly charge (never spread across months).
-  const additionalCost = rawAdditionalCost;
+  const additionalCost = calculateEnterpriseAdditionalCost(extraStorage);
   const selectedTier = getEnterpriseTierSelection(extraStorage);
   const tierRate = selectedTier?.rate ?? 0;
 
-  // Enterprise base cost is a monthly subscription.
-  // Additional quota is shown separately and treated as one-time yearly.
-  const monthlyBaseCost = businessPlan.cost;
+  const monthlyBaseCost = ENTERPRISE_ANNUAL_BASE_USD / 12;
 
   return {
     name: 'Enterprise',
@@ -161,8 +171,8 @@ const createEnterprisePlan = (
     users: '5+',
     isEnterprise: true,
     baseCost: monthlyBaseCost,
-    additionalCost: additionalCost,
-    tierRate: tierRate,
+    additionalCost,
+    tierRate,
     features: [
       formatStorage(totalStorage) + ' custom upload quota',
       '5+ users',
