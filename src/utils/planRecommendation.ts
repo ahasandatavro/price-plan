@@ -65,7 +65,7 @@ export const getRangeComparisonForStorage = (
       const additionalGB = Math.max(0, totalStorage - plan.storage);
       if (!isOnDemandWithinRegularLimit(additionalGB)) return null;
 
-      const rawAdditionalCost = calculateOnDemandAdditionalCost(additionalGB);
+      const rawAdditionalCost = calculateOnDemandAdditionalCost(additionalGB, plan.name);
       // Additional quota is a one-time yearly charge (never spread across months).
       const additionalCost = rawAdditionalCost;
 

@@ -127,20 +127,15 @@ export const ENTERPRISE_TIER_RATES = [
 
 export const DEFAULT_TIER_RATE = 0.9375;
 
-// On-demand (pay-as-you-go) tier rates for additional quota beyond a plan's included storage.
-// Tier selection is based on the size of the additional top-up amount (additionalGB), not totalGB.
-//
-// Rates:
-// - 0 - 1.2 TB: $1.110/GB
-// - 1.2 TB - 2.4 TB: $1.00/GB
-// - 2.4 TB - 5.0 TB: $0.90/GB
-// - 5.0 TB - 10.0 TB: $0.82/GB
-export const ON_DEMAND_TIER_RATES = [
-  { min: 0, max: 1228.8, rate: 1.110 }, // 0 TB - 1.2 TB
-  { min: 1228.8, max: 2457.6, rate: 1.0 }, // 1.2 TB - 2.4 TB
-  { min: 2457.6, max: 5120, rate: 0.90 }, // 2.4 TB - 5.0 TB
-  { min: 5120, max: 10240, rate: 0.82 } // 5.0 TB - 10.0 TB
-] as const;
+/**
+ * Pay As You Go — additional top-up pricing per GB by plan tier (yearly charge on extra quota).
+ */
+export const PAY_AS_YOU_GO_PER_GB_BY_PLAN: Record<string, number> = {
+  Starter: 3.75,
+  Growth: 1.25,
+  Pro: 1.25,
+  Business: 1
+} as const;
 
 // Regular-plan on-demand availability is capped at 10.0TB additional quota.
 export const ON_DEMAND_MAX_ADDITIONAL_GB = 10240;

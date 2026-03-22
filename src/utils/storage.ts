@@ -6,7 +6,7 @@ import {
   STORAGE_RATES,
   ENTERPRISE_TIER_RATES,
   DEFAULT_TIER_RATE,
-  ON_DEMAND_TIER_RATES,
+  PAY_AS_YOU_GO_PER_GB_BY_PLAN,
   ON_DEMAND_MAX_ADDITIONAL_GB
 } from '../constants/plans';
 
@@ -80,39 +80,24 @@ export const formatStorage = (gb: number): string => {
 };
 
 /**
- * Calculate pay-as-you-go additional quota cost (one-time yearly).
- *
- * Tier selection is based on the size of the additional top-up amount (additionalGB),
- * not on total required storage.
+ * $/GB for Pay As You Go top-ups for the given plan name (Starter, Growth, Pro, Business).
  */
-export const calculateOnDemandAdditionalCost = (additionalGB: number): number => {
+export const getPayAsYouGoRatePerGb = (planName: string): number => {
+  const rate = PAY_AS_YOU_GO_PER_GB_BY_PLAN[planName];
+  if (typeof rate === 'number') return rate;
+  // Monthly catalog has no Starter; default to Growth tier rate for unknown names.
+  return PAY_AS_YOU_GO_PER_GB_BY_PLAN.Growth ?? 1.25;
+};
+
+/**
+ * Calculate pay-as-you-go additional quota cost (one-time yearly).
+ * Rate depends on which plan tier the top-up applies to (not volume bands).
+ */
+export const calculateOnDemandAdditionalCost = (additionalGB: number, planName: string): number => {
   const safeAdditional = Math.max(0, additionalGB);
   if (safeAdditional === 0) return 0;
-
-  let remaining = safeAdditional;
-  let cost = 0;
-
-  // Charge within defined tier ranges.
-  for (const tier of ON_DEMAND_TIER_RATES) {
-    const tierSize = tier.max - tier.min;
-    const chunk = Math.min(remaining, tierSize);
-    if (chunk <= 0) break;
-
-    cost += chunk * tier.rate;
-    remaining -= chunk;
-
-    if (remaining <= 0) break;
-  }
-
-  // Overflow beyond the defined max tier span:
-  // apply the last tier rate to remaining extra so enterprise can still price above 10TB.
-  if (remaining > 0) {
-    const lastRate = ON_DEMAND_TIER_RATES[ON_DEMAND_TIER_RATES.length - 1]?.rate ?? 0;
-    cost += remaining * lastRate;
-  }
-
-  // Clamp tiny negatives from floating point edge cases.
-  return Math.max(0, cost);
+  const ratePerGb = getPayAsYouGoRatePerGb(planName);
+  return Math.max(0, safeAdditional * ratePerGb);
 };
 
 export interface OnDemandTierSelection {
@@ -120,35 +105,14 @@ export interface OnDemandTierSelection {
   rate: number;
 }
 
-const ON_DEMAND_TIER_LABELS = [
-  '0 TB - 1.2 TB',
-  '1.2 TB - 2.4 TB',
-  '2.4 TB - 5.0 TB',
-  '5.0 TB - 10.0 TB'
-] as const;
-
 /**
- * Get the active on-demand tier based on additional top-up size.
- * This follows the same rule used for pricing tier selection by additionalGB.
+ * Pay-as-you-go tier info for display (plan-based rate).
  */
-export const getOnDemandTierSelection = (additionalGB: number): OnDemandTierSelection | null => {
-  const safeAdditional = Math.max(0, additionalGB);
-  if (safeAdditional <= 0) return null;
-
-  for (let index = 0; index < ON_DEMAND_TIER_RATES.length; index += 1) {
-    const tier = ON_DEMAND_TIER_RATES[index];
-    if (safeAdditional <= tier.max) {
-      return {
-        label: ON_DEMAND_TIER_LABELS[index] ?? `${(tier.min / 1024).toFixed(1)} TB - ${(tier.max / 1024).toFixed(1)} TB`,
-        rate: tier.rate
-      };
-    }
-  }
-
-  const lastTier = ON_DEMAND_TIER_RATES[ON_DEMAND_TIER_RATES.length - 1];
+export const getPayAsYouGoTierInfo = (planName: string): OnDemandTierSelection | null => {
+  const rate = getPayAsYouGoRatePerGb(planName);
   return {
-    label: ON_DEMAND_TIER_LABELS[ON_DEMAND_TIER_LABELS.length - 1],
-    rate: lastTier?.rate ?? 0
+    label: `${planName} tier`,
+    rate
   };
 };
 

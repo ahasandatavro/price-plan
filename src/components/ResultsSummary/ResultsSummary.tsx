@@ -82,7 +82,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
     const recommendedOption = comparison.options.find((option) => option.name === recommendedPlan.name);
 
     const fallbackAdditionalGB = Math.max(0, requiredGB - recommendedPlan.storage);
-    const fallbackRawAdditionalCost = calculateOnDemandAdditionalCost(fallbackAdditionalGB);
+    const fallbackRawAdditionalCost = calculateOnDemandAdditionalCost(fallbackAdditionalGB, recommendedPlan.name);
     const fallbackAdditionalCost = fallbackRawAdditionalCost;
     const fallbackTotalCost = recommendedPlan.cost * monthsInYear + fallbackAdditionalCost;
 
