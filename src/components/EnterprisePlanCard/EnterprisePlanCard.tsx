@@ -42,12 +42,18 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
         style={{ transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
       >
         <div
-          className={`relative rounded-lg overflow-hidden transition-all duration-200 flex flex-col h-full bg-white border border-gray-200 shadow-sm hover:border-gray-300 [backface-visibility:hidden] ${
-            isLockedNonRecommended ? 'blur-sm opacity-40' : ''
-          }`}
+          className={`relative rounded-lg overflow-hidden transition-all duration-200 flex flex-col h-full [backface-visibility:hidden] ${
+            isRecommended
+              ? 'bg-white border border-[#AD0FF0] shadow-sm'
+              : 'bg-white border border-gray-200 shadow-sm hover:border-gray-300'
+          } ${isLockedNonRecommended ? 'blur-sm opacity-40' : ''}`}
         >
           {!isPlaceholder && (
-            <div className="bg-gray-900 text-white text-center py-2 px-4">
+            <div
+              className={`text-white text-center py-2 px-4 ${
+                isRecommended ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0]' : 'bg-gray-900'
+              }`}
+            >
               <span className="text-xs font-semibold uppercase tracking-widest">
                 {isRecommended ? 'Recommended' : 'Enterprise Plan'}
               </span>
@@ -106,11 +112,22 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
               {!isPlaceholder && (
                 <button
                   type="button"
-                  className="cursor-pointer w-full mb-3 py-2 rounded border border-gray-300 text-gray-700 text-sm font-medium bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                  className={`cursor-pointer w-full mb-3 py-2 rounded border text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                    isRecommended
+                      ? 'border-[#AD0FF0]/30 text-[#594AE0] bg-white hover:bg-[#AD0FF0]/10'
+                      : 'border-gray-300 text-gray-700 bg-gray-50 hover:bg-gray-100'
+                  }`}
                   onClick={() => setIsFlipped(true)}
                 >
-                  <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gray-100">
-                    <HelpCircle className="w-3.5 h-3.5 text-gray-600" aria-hidden />
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isRecommended ? 'bg-[#594AE0]/10' : 'bg-gray-100'
+                    }`}
+                  >
+                    <HelpCircle
+                      className={`w-3.5 h-3.5 ${isRecommended ? 'text-[#594AE0]' : 'text-gray-600'}`}
+                      aria-hidden
+                    />
                   </span>
                   Price breakdown
                 </button>
@@ -120,7 +137,11 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
                 href={MEDIAZILLA_ENTERPRISE_CONTACT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 rounded font-medium text-sm transition-colors bg-gray-900 text-white hover:bg-gray-800 cursor-pointer block text-center"
+                className={`w-full py-3 rounded font-medium text-sm transition-colors cursor-pointer block text-center ${
+                  isRecommended
+                    ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90'
+                    : 'bg-gray-900 text-white hover:bg-gray-800'
+                }`}
               >
                 Contact Sales Team
               </a>
@@ -133,7 +154,13 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
             isLockedNonRecommended ? 'blur-sm opacity-40' : ''
           }`}
         >
-          <div className="bg-gradient-to-r from-gray-600 to-gray-700 px-5 py-3 flex items-center justify-between flex-shrink-0">
+          <div
+            className={`px-5 py-3 flex items-center justify-between flex-shrink-0 ${
+              isRecommended
+                ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0]'
+                : 'bg-gradient-to-r from-gray-600 to-gray-700'
+            }`}
+          >
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-white">
                 Price breakdown
@@ -142,7 +169,11 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
             </div>
             <button
               type="button"
-              className="flex items-center gap-1.5 text-xs text-white hover:text-white transition-colors cursor-pointer bg-gray-800/90 hover:bg-gray-800 px-2.5 py-1.5 rounded-full"
+              className={`flex items-center gap-1.5 text-xs text-white hover:text-white transition-colors cursor-pointer px-2.5 py-1.5 rounded-full ${
+                isRecommended
+                  ? 'bg-gradient-to-r from-[#594AE0]/90 to-[#AD0FF0]/90 hover:opacity-90'
+                  : 'bg-gray-800/90 hover:bg-gray-800'
+              }`}
               onClick={() => setIsFlipped(false)}
             >
               <EyeOff className="w-3 h-3" />
@@ -162,7 +193,9 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
 
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gray-700 rounded-full transition-all duration-700"
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    isRecommended ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0]' : 'bg-gray-700'
+                  }`}
                   style={{
                     width: `${Math.min(
                       100,
@@ -206,11 +239,25 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
               </div>
 
               {/* Total callout */}
-              <div className="mt-auto bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-800">Annual Total</span>
-                <span className="text-lg font-bold text-gray-900">
+              <div
+                className={`mt-auto rounded-lg px-4 py-3 flex items-center justify-between ${
+                  isRecommended
+                    ? 'bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 border border-[#AD0FF0]/20'
+                    : 'bg-gray-50 border border-gray-200'
+                }`}
+              >
+                <span className={`text-sm font-semibold ${isRecommended ? 'text-[#AD0FF0]' : 'text-gray-800'}`}>
+                  Annual Total
+                </span>
+                <span className={`text-lg font-bold ${isRecommended ? 'text-[#AD0FF0]' : 'text-gray-900'}`}>
                   {isPlaceholder ? '**' : `$${(plan.baseCost * 12 + plan.additionalCost).toFixed(2)}`}
-                  {!isPlaceholder && <span className="text-xs font-medium text-gray-500">/yr</span>}
+                  {!isPlaceholder && (
+                    <span
+                      className={`text-xs font-medium ${isRecommended ? 'text-[#AD0FF0]/70' : 'text-gray-500'}`}
+                    >
+                      /yr
+                    </span>
+                  )}
                 </span>
               </div>
             </div>
