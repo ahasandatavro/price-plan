@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Check, Database, EyeOff, HelpCircle, Plus, Sparkles, Users } from 'lucide-react';
+import { Check, Database, EyeOff, HelpCircle, Plus, Users } from 'lucide-react';
 import type { Plan, BillingCycle } from '../../types';
 import {
   calculateOnDemandAdditionalCost,
