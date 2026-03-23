@@ -65,6 +65,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   const rangeComparison = hasCalculation
     ? getRangeComparisonForStorage(result.totalStorage, result.allPlans, billingCycle)
     : { options: [] };
+  const shouldLockNonRecommendedPlans = hasCalculation && uiRecommendedPlan !== null;
 
   // Sort plans so recommended plan appears first
   const planEntries = Object.entries(result.allPlans);
@@ -187,6 +188,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
                     }
                     isContentSellBlocked={contentSellBlocked}
                     contentSellTooltip={contentSellTooltip}
+                    isRecommendationLocked={shouldLockNonRecommendedPlans}
                   />
                 </div>
               );

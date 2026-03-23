@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Check, Database, Eye, EyeOff, Plus, Users } from 'lucide-react';
+import { Check, Database, EyeOff, HelpCircle, Plus, Sparkles, Users } from 'lucide-react';
 import type { Plan, BillingCycle } from '../../types';
 import {
   calculateOnDemandAdditionalCost,
@@ -31,6 +31,11 @@ interface PlanCardProps {
   comparisonOptions?: WhyRecommendationOption[];
   /** Shown on the flip side when this card is not the recommended plan */
   recommendedPlanName?: string;
+  /**
+   * When true and this card is NOT the recommended plan, the card becomes visually
+   * blurred and its actions are disabled.
+   */
+  isRecommendationLocked?: boolean;
 }
 
 export const PlanCard: React.FC<PlanCardProps> = ({
@@ -42,9 +47,11 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   contentSellTooltip,
   requiredStorage = 0,
   comparisonOptions = [],
-  recommendedPlanName
+  recommendedPlanName,
+  isRecommendationLocked = false
 }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
+  const isLockedNonRecommended = isRecommendationLocked && !isRecommended;
   const selectedOption = React.useMemo((): WhyRecommendationOption | undefined => {
     const existing = comparisonOptions.find((option) => option.name === plan.name);
     if (existing) return existing;
@@ -56,16 +63,27 @@ export const PlanCard: React.FC<PlanCardProps> = ({
     const totalCost = baseCost * 12 + additionalCost;
     return { name: plan.name, baseCost, additionalGB, additionalCost, totalCost };
   }, [comparisonOptions, plan, requiredStorage]);
-  const canGetStarted = meetsRequirement && !isContentSellBlocked;
+  const canGetStarted = meetsRequirement && !isContentSellBlocked && !isLockedNonRecommended;
   const extraGbRequired =
     requiredStorage > 0 ? Math.max(0, requiredStorage - plan.storage) : 0;
   const extraAnnualPayAsYouGoCost =
     extraGbRequired > 0 ? calculateOnDemandAdditionalCost(extraGbRequired, plan.name) : 0;
 
   const showInsightButton = requiredStorage > 0 && selectedOption !== undefined;
+  const formatStorageCompact = (gb: number): string => {
+    if (gb >= 1024) {
+      const tb = gb / 1024;
+      const rounded = Math.round(tb * 10) / 10;
+      return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)} TB`;
+    }
+    const rounded = Math.round(gb * 10) / 10;
+    return `${rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1)} GB`;
+  };
 
   return (
-    <div className="h-full [perspective:1200px]">
+    <div
+      className={`h-full [perspective:1200px] ${isLockedNonRecommended ? 'pointer-events-none select-none' : ''}`}
+    >
       <div
         className="relative h-full transition-transform duration-500 [transform-style:preserve-3d]"
         style={{ transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
@@ -78,11 +96,14 @@ export const PlanCard: React.FC<PlanCardProps> = ({
               : meetsRequirement
               ? 'bg-white border border-gray-200 shadow-sm hover:border-gray-300'
               : 'bg-gray-50 border border-gray-200 shadow-sm opacity-60'
-          }`}
+          } ${isLockedNonRecommended ? 'blur-sm opacity-40' : ''}`}
         >
           {isRecommended && (
             <div className="bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white text-center py-2 px-4">
-              <span className="text-xs font-semibold uppercase tracking-wider">Recommended</span>
+              <div className="flex items-center justify-center gap-2">
+                <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+                <span className="text-xs font-semibold uppercase tracking-widest">Recommended Plan</span>
+              </div>
             </div>
           )}
 
@@ -95,12 +116,19 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                   <span className="text-4xl font-semibold text-gray-900">
                     ${billingCycle === 'annual' ? Math.round(plan.cost) : plan.cost}
                   </span>
-                  <span className="text-gray-600 text-base">/month</span>
+                  <span className="text-gray-600 text-base">/mo</span>
                   {extraAnnualPayAsYouGoCost > 0 && (
-                    <span className="inline-flex items-center gap-0.5 text-xl font-semibold text-[#AD0FF0]">
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xl font-semibold text-[#AD0FF0] whitespace-nowrap"
+                      title="Pay as you go"
+                      aria-label="Pay as you go (annual on-demand upload)"
+                    >
                       <Plus className="w-5 h-5 shrink-0" strokeWidth={2.5} aria-hidden />
-                      <span>${extraAnnualPayAsYouGoCost.toFixed(2)}</span>
-                      <span className="text-sm font-medium text-[#AD0FF0]/85">/yr extra</span>
+                      <span>${Math.round(extraAnnualPayAsYouGoCost).toFixed(0)}</span>
+                      <span className="text-sm font-medium text-[#AD0FF0]/85">/yr</span>
+                      <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
+                        Pay as you go
+                      </span>
                     </span>
                   )}
                 </div>
@@ -113,19 +141,58 @@ export const PlanCard: React.FC<PlanCardProps> = ({
 
               <div className="flex items-center gap-4 py-3 px-4 bg-gray-50 rounded border border-gray-200">
                 <div className="flex items-center gap-2 flex-1">
-                  <Database className="w-4 h-4 text-gray-600" />
-                  <div className="text-left">
-                    <p className="text-xs text-gray-500">Upload quota</p>
-                    <p className="text-sm font-medium text-gray-900">{formatStorage(plan.storage)}</p>
-                  </div>
+                  {isRecommended ? (
+                    <div className="text-left">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                        Upload quota
+                      </p>
+                      <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                        {formatStorageCompact(plan.storage)}
+                      </p>
+                      <p className="text-[11px] text-gray-500">per year</p>
+                    </div>
+                  ) : (
+                    <>
+                      <Database className="w-4 h-4 text-gray-600" />
+                      <div className="text-left">
+                        <p className="text-xs text-gray-500">Upload quota</p>
+                        <p className="text-sm font-medium text-gray-900">{formatStorage(plan.storage)}</p>
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="w-px h-8 bg-gray-300"></div>
                 <div className="flex items-center gap-2 flex-1">
-                  <Users className="w-4 h-4 text-gray-600" />
-                  <div className="text-left">
-                    <p className="text-xs text-gray-500">Users</p>
-                    <p className="text-sm font-medium text-gray-900">{plan.users}</p>
-                  </div>
+                  {isRecommended ? (
+                    <>
+                      <div className="text-left min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                          Pay as you go
+                        </p>
+                        {extraGbRequired > 0 ? (
+                          <>
+                            <p className="text-sm font-bold text-[#AD0FF0] mt-1 flex items-center gap-1">
+                              <Plus className="w-3.5 h-3.5" strokeWidth={3} aria-hidden />
+                              {formatStorageCompact(extraGbRequired)}
+                            </p>
+                            <p className="text-[11px] font-semibold text-[#594AE0] uppercase tracking-wider">
+                              overage included
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm font-bold text-gray-600 mt-1">No overage</p>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Users className="w-4 h-4 text-gray-600" />
+                      <div className="text-left">
+                        <p className="text-xs text-gray-500">Users</p>
+                        <p className="text-sm font-medium text-gray-900">{plan.users}</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -135,8 +202,14 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                 .filter((feature) => !feature.toLowerCase().startsWith('everything in'))
                 .map((feature, idx) => (
                   <div key={idx} className="flex items-start gap-2">
-                    <div className="mt-0.5 flex-shrink-0">
-                      <Check className="w-4 h-4 text-black" />
+                    <div
+                      className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                        isRecommended ? 'bg-[#594AE0]' : ''
+                      }`}
+                    >
+                      <Check
+                        className={`w-3.5 h-3.5 ${isRecommended ? 'text-white' : 'text-black'}`}
+                      />
                     </div>
                     <span className="text-sm text-gray-700">{feature}</span>
                   </div>
@@ -149,13 +222,23 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                   type="button"
                   className={`cursor-pointer w-full mb-3 py-2 rounded border text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                     isRecommended
-                      ? 'border-[#AD0FF0]/20 text-[#AD0FF0] bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 hover:from-[#594AE0]/20 hover:to-[#AD0FF0]/20'
+                      ? 'border-[#AD0FF0]/30 text-[#594AE0] bg-white hover:bg-[#AD0FF0]/10'
                       : 'border-gray-300 text-gray-700 bg-gray-50 hover:bg-gray-100'
                   }`}
-                  onClick={() => setIsFlipped(true)}
+                  disabled={isLockedNonRecommended}
+                  onClick={() => {
+                    if (isLockedNonRecommended) return;
+                    setIsFlipped(true);
+                  }}
                 >
-                  <Eye className="w-4 h-4" />
-                  {isRecommended ? 'Why Recommended' : 'Why not recommended'}
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isRecommended ? 'bg-[#594AE0]/10' : 'bg-gray-100'
+                    }`}
+                  >
+                    <HelpCircle className={`w-3.5 h-3.5 ${isRecommended ? 'text-[#594AE0]' : 'text-gray-600'}`} aria-hidden />
+                  </span>
+                  {isRecommended ? 'Why Recommended?' : 'Why not recommended?'}
                 </button>
               )}
 
@@ -180,15 +263,21 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                       : 'bg-gray-900 text-white hover:bg-gray-800 cursor-pointer'
                   }`}
                 >
-                  Get Started
+                  Get Started →
                 </a>
               ) : (
                 <button
                   className="w-full py-3 rounded font-medium text-sm transition-colors bg-gray-200 text-gray-500 cursor-not-allowed"
                   disabled
-                  title={isContentSellBlocked ? contentSellTooltip : undefined}
+                  title={
+                    isLockedNonRecommended
+                      ? 'This plan is not recommended for your selected quota'
+                      : isContentSellBlocked
+                        ? contentSellTooltip
+                        : undefined
+                  }
                 >
-                  Unavailable
+                  {isLockedNonRecommended ? 'Not Recommended' : 'Unavailable'}
                 </button>
               )}
             </div>
@@ -199,7 +288,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
         <div
           className={`absolute inset-0 rounded-lg bg-white shadow-sm [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden flex flex-col border ${
             isRecommended ? 'border-[#AD0FF0]' : 'border-gray-300'
-          }`}
+          } ${isLockedNonRecommended ? 'blur-sm opacity-40' : ''}`}
         >
           {/* Header stripe */}
           <div
@@ -222,7 +311,11 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                   ? 'bg-gradient-to-r from-[#594AE0]/90 to-[#AD0FF0]/90 hover:opacity-90'
                   : 'bg-gray-800/90 hover:bg-gray-800'
               }`}
-              onClick={() => setIsFlipped(false)}
+              disabled={isLockedNonRecommended}
+              onClick={() => {
+                if (isLockedNonRecommended) return;
+                setIsFlipped(false);
+              }}
             >
               <EyeOff className="w-3 h-3" />
               Back
@@ -267,6 +360,17 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                     <span className="text-gray-500">Base plan / month</span>
                     <span className="font-medium text-gray-800">
                       ${billingCycle === 'annual' ? Math.round(selectedOption.baseCost) : selectedOption.baseCost.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-500">
+                      Pay as you go
+                      <span className="ml-1 text-xs text-gray-400">
+                        ({formatStorage(selectedOption.additionalGB)})
+                      </span>
+                    </span>
+                    <span className="font-medium text-gray-800">
+                      ${selectedOption.additionalCost.toFixed(2)}/yr
                     </span>
                   </div>
                   {billingCycle === 'annual' && (
