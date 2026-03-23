@@ -81,7 +81,8 @@ export const PLANS: Plans = {
     },
     pro: { 
       name: 'Pro', 
-      cost: 51, 
+      // 51.25 * 12 = 615
+      cost: 51.25, 
       storage: 600, 
       users: 2,
       features: [
