@@ -15,6 +15,7 @@ import {
   getRangeComparisonForStorage
 } from '../../utils/planRecommendation';
 import {
+  ENTERPRISE_ANNUAL_BASE_USD,
   ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD,
   ENTERPRISE_MIN_TOTAL_GB,
   MEDIAZILLA_ENTERPRISE_CONTACT_URL,
@@ -180,6 +181,10 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                           ).toFixed(2)}
                         </p>
                         <p className="text-xs text-gray-600">/year</p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Annual: ${ENTERPRISE_ANNUAL_BASE_USD.toLocaleString()}/yr + Additional pre-paid quota
+                          charges
+                        </p>
                       </>
                     ) : (
                       <>

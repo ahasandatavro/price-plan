@@ -6,7 +6,11 @@
 import React from 'react';
 import { Check, Users, Database, HelpCircle, EyeOff } from 'lucide-react';
 import type { EnterprisePlan, BillingCycle } from '../../types';
-import { MEDIAZILLA_ENTERPRISE_CONTACT_URL } from '../../constants/plans';
+import {
+  MEDIAZILLA_ENTERPRISE_CONTACT_URL,
+  ENTERPRISE_ANNUAL_BASE_USD,
+  ENTERPRISE_PREPAID_RATE_TABLE
+} from '../../constants/plans';
 import { formatStorage } from '../../utils/storage';
 
 interface EnterprisePlanCardProps {
@@ -72,7 +76,9 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
                   <span className="text-gray-600 text-base">{isPlaceholder ? '' : '/year'}</span>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
-                  {isPlaceholder ? '** billed annually' : `${totalAnnualCost.toFixed(2)} billed annually`}
+                  {isPlaceholder
+                    ? '**'
+                    : `Annual: $${ENTERPRISE_ANNUAL_BASE_USD.toLocaleString()}/yr + Additional pre-paid quota charges`}
                 </p>
               </div>
 
@@ -215,7 +221,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
 
             {/* Cost breakdown */}
             <div className="flex flex-col gap-2 flex-grow">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5">Cost Breakdown</p>
+           
 
               <div className="flex flex-col gap-1.5 text-sm">
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">

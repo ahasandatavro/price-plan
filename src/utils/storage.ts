@@ -7,7 +7,8 @@ import {
   ENTERPRISE_TIER_RATES,
   DEFAULT_TIER_RATE,
   PAY_AS_YOU_GO_PER_GB_BY_PLAN,
-  ON_DEMAND_MAX_ADDITIONAL_GB
+  ON_DEMAND_MAX_ADDITIONAL_GB,
+  ENTERPRISE_PREPAID_ADDITIONAL_GB
 } from '../constants/plans';
 
 /**
@@ -128,16 +129,23 @@ export const getPayAsYouGoTierInfo = (planName: string): OnDemandTierSelection |
   };
 };
 
-/** Pre-paid quota after first 1.2 TB included (additional GB beyond Business storage). */
+/**
+ * Pre-paid quota after first 1.2 TB included (additional GB beyond Business storage).
+ * Bands: 0–1.2 TB @ $0.875; 1.21–2.6 TB @ $0.8125; 2.61+ TB @ $0.75 per GB.
+ */
 const ENTERPRISE_PREPAID_TIER_RATES = [
-  { min: 0, max: 1228.8, rate: 0.875 }, // 0 TB - 1.2 TB additional
-  { min: 1228.8, max: 5120, rate: 0.8125 } // 1.2 TB - 5 TB additional
+  { min: 0, max: ENTERPRISE_PREPAID_ADDITIONAL_GB.tier1Max, rate: 0.875 },
+  {
+    min: ENTERPRISE_PREPAID_ADDITIONAL_GB.tier1Max,
+    max: ENTERPRISE_PREPAID_ADDITIONAL_GB.tier2Max,
+    rate: 0.8125
+  }
 ] as const;
 
 const ENTERPRISE_PREPAID_LABELS = [
-  '0 TB - 1.2 TB (pre-paid)',
-  '1.2 TB - 5 TB (pre-paid)',
-  '5.1 TB+ (pre-paid)'
+  '0 TB - 1.2 TB',
+  '1.21 TB - 2.6 TB',
+  '2.61+ TB'
 ] as const;
 
 const ENTERPRISE_PREPAID_OVERFLOW_RATE = 0.75;

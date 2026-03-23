@@ -153,6 +153,24 @@ export const ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD = BUSINESS_ANNUAL_MAX_TOTA
 /** Fixed Enterprise annual subscription before pre-paid add-ons. */
 export const ENTERPRISE_ANNUAL_BASE_USD = 1125;
 
+/**
+ * Prepaid quota is charged on storage **beyond** the first 1.2 TB (Business included quota).
+ * Cumulative additional GB boundaries (tier 2 ends at 2.6 TB additional; tier 3 is 2.61+ TB additional).
+ */
+export const ENTERPRISE_PREPAID_ADDITIONAL_GB = {
+  /** First band: 0 TB – 1.2 TB additional (= 1228.8 GB). */
+  tier1Max: 1228.8,
+  /** Second band ends at 2.6 TB additional cumulative (= 2662.4 GB). */
+  tier2Max: 2662.4
+} as const;
+
+/** Display copy + rates ($/GB) for Enterprise prepaid tiers (additional quota after first 1.2 TB). */
+export const ENTERPRISE_PREPAID_RATE_TABLE = [
+  { rangeLabel: '0 TB - 1.2 TB', rateUsdPerGb: 0.875 },
+  { rangeLabel: '1.21 TB - 2.6 TB', rateUsdPerGb: 0.8125 },
+  { rangeLabel: '2.61+ TB', rateUsdPerGb: 0.75 }
+] as const;
+
 /** Enterprise CTA — https://mediazilla.com/contact-us */
 export const MEDIAZILLA_ENTERPRISE_CONTACT_URL = 'https://mediazilla.com/contact-us';
 

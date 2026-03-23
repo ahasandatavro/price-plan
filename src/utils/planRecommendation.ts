@@ -150,7 +150,8 @@ export const findRecommendedPlan = (
  * Create an enterprise plan with custom pricing
  *
  * - Annual base: ENTERPRISE_ANNUAL_BASE_USD ($1,125/yr) + pre-paid quota charges
- * - Pre-paid rates apply to storage beyond included 1.2 TB (Business).
+ * - Pre-paid rates apply to storage beyond included 1.2 TB (Business):
+ *   0–1.2 TB additional @ $0.875/GB, 1.21–2.6 TB additional @ $0.8125/GB, 2.61+ TB @ $0.75/GB.
  */
 const createEnterprisePlan = (
   totalStorage: number,
