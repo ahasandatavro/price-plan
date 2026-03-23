@@ -88,7 +88,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
                 onClick={() => setIsFlipped(true)}
               >
                 <Eye className="w-4 h-4" />
-                Why Recommended
+                Price breakdown
               </button>
 
               <a
@@ -106,7 +106,9 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
         <div className="absolute inset-0 rounded-lg border border-[#AD0FF0] bg-white shadow-sm [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] px-5 py-3 flex items-center justify-between flex-shrink-0">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white">Why Recommended</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white">
+                Price breakdown
+              </p>
               <h3 className="text-base font-semibold text-white mt-0.5">{plan.name}</h3>
             </div>
             <button

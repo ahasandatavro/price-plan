@@ -175,9 +175,9 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                               <Plus className="w-3.5 h-3.5" strokeWidth={3} aria-hidden />
                               {formatStorageCompact(extraGbRequired)}
                             </p>
-                            <p className="text-[11px] font-semibold text-[#594AE0] uppercase tracking-wider">
+                            {/* <p className="text-[11px] font-semibold text-[#594AE0] uppercase tracking-wider">
                               overage included
-                            </p>
+                            </p> */}
                           </>
                         ) : (
                           <>
