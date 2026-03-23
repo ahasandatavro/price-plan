@@ -263,6 +263,8 @@ export const PlanCard: React.FC<PlanCardProps> = ({
               {canGetStarted ? (
                 <a
                   href="https://mediazilla.com/onboarding"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`w-full py-3 rounded font-medium text-sm transition-colors block text-center ${
                     isRecommended
                       ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer'
