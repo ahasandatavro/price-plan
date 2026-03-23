@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Check, Users, Database, Eye, EyeOff } from 'lucide-react';
+import { Check, Users, Database, HelpCircle, EyeOff } from 'lucide-react';
 import type { EnterprisePlan, BillingCycle } from '../../types';
 import { MEDIAZILLA_ENTERPRISE_CONTACT_URL } from '../../constants/plans';
 import { formatStorage } from '../../utils/storage';
@@ -84,10 +84,10 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
             <div className="mt-auto">
               <button
                 type="button"
-                className=" cursor-pointer w-full mb-3 py-2 rounded border border-[#AD0FF0]/20 text-[#AD0FF0] bg-gradient-to-r from-[#594AE0]/10 to-[#AD0FF0]/10 text-sm font-medium hover:bg-gradient-to-r hover:from-[#594AE0]/20 hover:to-[#AD0FF0]/20 transition-colors flex items-center justify-center gap-2"
+                className=" cursor-pointer w-full mb-3 py-2 rounded border border-[#AD0FF0]/20 text-[#594AE0]  text-sm font-medium hover:bg-gradient-to-r hover:from-[#594AE0]/20 hover:to-[#AD0FF0]/20 transition-colors flex items-center justify-center gap-2"
                 onClick={() => setIsFlipped(true)}
               >
-                <Eye className="w-4 h-4" />
+                 <HelpCircle className="w-3.5 h-3.5 text-[#594AE0]" aria-hidden />
                 Price breakdown
               </button>
 
