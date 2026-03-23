@@ -69,11 +69,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Calculate Upload Quota Requirements</h3>
       
       <div className="grid grid-cols-1  lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {/* Films per year */}
+        {/* Projects in next 12 months */}
         <div>
           <label htmlFor="films" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
             <Film className="w-4 h-4 text-gray-500 hidden sm:block" />
-            How many films do you shoot each year
+            How many projects do you plan to deliver in the next 12 months?
           </label>
           <input
             id="films"
@@ -82,17 +82,17 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
             onChange={(e) => handleNumericChange('films', e.target.value)}
             onKeyDown={handleKeyDown}
             onPaste={(e) => handlePaste(e, 'films')}
-            placeholder="eg.50 films"
+            placeholder="e.g. 50"
             min="0"
             className="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
           />
         </div>
 
-        {/* Duration */}
+        {/* Average video length per project */}
         <div>
           <label htmlFor="duration" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
             <Clock className="w-4 h-4 text-gray-500 hidden sm:block" />
-            What is the total duration of each film (minutes)
+            What is the average length of videos per project (in mins)?
           </label>
           <input
             id="duration"
@@ -101,16 +101,16 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
             onChange={(e) => handleNumericChange('duration', e.target.value)}
             onKeyDown={handleKeyDown}
             onPaste={(e) => handlePaste(e, 'duration')}
-            placeholder="eg.120min"
+            placeholder="e.g. 120"
             min="0"
             className="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
           />
         </div>
 
-        {/* 4K Films Count */}
+        {/* 4K video count */}
         <div>
           <label htmlFor="fourk-percent" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            How many films delivered in 4K
+            Approximately how many of your videos are delivered in 4K?
           </label>
           <input
             id="fourk-percent"
@@ -127,12 +127,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
                 handleFourKFilmsChange(numericValue);
               }
             }}
-            placeholder="eg.20 films"
+            placeholder="e.g. 20"
             min="0"
             className="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
           />
           <p className="text-xs text-gray-500 mt-1">
-            Enter how many of your total films are delivered in 4K
+            Must not exceed your number of projects above.
           </p>
         </div>
 
