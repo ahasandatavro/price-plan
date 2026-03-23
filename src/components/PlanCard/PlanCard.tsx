@@ -173,7 +173,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                             </p>
                             <p className="text-sm font-bold text-[#AD0FF0] mt-1 flex items-center gap-1">
                               <Plus className="w-3.5 h-3.5" strokeWidth={3} aria-hidden />
-                              {formatStorageCompact(extraGbRequired)}
+                              {`${Math.round(extraGbRequired)} GB`}
                             </p>
                             {/* <p className="text-[11px] font-semibold text-[#594AE0] uppercase tracking-wider">
                               overage included

@@ -9,8 +9,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { CalculationResult, BillingCycle, EnterprisePlan } from '../../types';
 import { PlanCard } from '../PlanCard/PlanCard';
 import { EnterprisePlanCard } from '../EnterprisePlanCard/EnterprisePlanCard';
-import { isOnDemandWithinRegularLimit } from '../../utils/storage';
+import { calculateEnterpriseAdditionalCost, isOnDemandWithinRegularLimit } from '../../utils/storage';
 import { getRangeComparisonForStorage } from '../../utils/planRecommendation';
+import { ENTERPRISE_ANNUAL_BASE_USD } from '../../constants/plans';
 
 interface PlansGridProps {
   result: CalculationResult;
@@ -66,6 +67,29 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
     ? getRangeComparisonForStorage(result.totalStorage, result.allPlans, billingCycle)
     : { options: [] };
   const shouldLockNonRecommendedPlans = hasCalculation && uiRecommendedPlan !== null;
+  const enterpriseBaseMonthly = ENTERPRISE_ANNUAL_BASE_USD / 12;
+  const businessStorageCap = (result.allPlans as any).business?.storage ?? 1228.8;
+  const enterpriseAdditionalGB = Math.max(0, result.totalStorage - businessStorageCap);
+  const defaultEnterprisePlan: EnterprisePlan = {
+    name: 'Enterprise',
+    cost: enterpriseBaseMonthly,
+    storage: Math.max(result.totalStorage, businessStorageCap),
+    users: '5+',
+    isEnterprise: true,
+    baseCost: enterpriseBaseMonthly,
+    additionalCost: calculateEnterpriseAdditionalCost(enterpriseAdditionalGB),
+    tierRate: 0,
+    features: [
+      'Custom upload quota',
+      '5+ users',
+      'Everything in Business plan',
+      'Dedicated account manager',
+      'Custom integrations',
+      'Priority support'
+    ]
+  };
+  const enterprisePlanForCard =
+    uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan) ? uiRecommendedPlan : defaultEnterprisePlan;
 
   // Sort plans so recommended plan appears first
   const planEntries = Object.entries(result.allPlans);
@@ -90,14 +114,18 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
     return 0; // Keep original order for non-recommended plans
   });
 
-  // Prepare all plans for carousel (including enterprise if recommended)
+  const isEnterpriseRecommended = Boolean(
+    hasCalculation && uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan)
+  );
+
+  // Prepare all plans for carousel (enterprise appears first when recommended, otherwise last)
   const allPlansForCarousel: Array<{ type: 'enterprise' | 'regular'; key: string; plan: any }> = [];
-  
-  if (hasCalculation && uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan)) {
+
+  if (isEnterpriseRecommended) {
     allPlansForCarousel.push({
       type: 'enterprise',
       key: 'enterprise',
-      plan: uiRecommendedPlan
+      plan: enterprisePlanForCard
     });
   }
 
@@ -108,6 +136,14 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
       plan
     });
   });
+
+  if (!isEnterpriseRecommended) {
+    allPlansForCarousel.push({
+      type: 'enterprise',
+      key: 'enterprise',
+      plan: enterprisePlanForCard
+    });
+  }
 
   return (
     <div className="mb-8 relative">
@@ -158,6 +194,9 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
                       plan={plan}
                       billingCycle={billingCycle}
                       requiredStorage={result.totalStorage}
+                      isRecommended={Boolean(hasCalculation && uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan))}
+                      showPlaceholder={!hasCalculation}
+                      isRecommendationLocked={shouldLockNonRecommendedPlans}
                     />
                   </div>
                 );
