@@ -135,8 +135,6 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
 
               <a
                 href={MEDIAZILLA_ENTERPRISE_CONTACT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
                 className={`w-full py-3 rounded font-medium text-sm transition-colors cursor-pointer block text-center ${
                   isRecommended
                     ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90'
