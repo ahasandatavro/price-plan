@@ -48,7 +48,7 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
               : 'bg-white border border-gray-200 shadow-sm hover:border-gray-300'
           } ${isLockedNonRecommended ? 'blur-sm opacity-40' : ''}`}
         >
-          {!isPlaceholder && (
+          {!isPlaceholder && !isLockedNonRecommended && (
             <div
               className={`text-white text-center py-2 px-4 ${
                 isRecommended ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0]' : 'bg-gray-900'
