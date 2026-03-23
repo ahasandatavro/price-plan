@@ -279,17 +279,6 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                                 : whyData.recommended.baseCost.toFixed(2)}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-500">
-                              Pay as you go
-                              <span className="ml-1 text-xs text-gray-400">
-                                ({formatStorage(whyData.recommended.additionalGB)})
-                              </span>
-                            </span>
-                            <span className="font-medium text-gray-800">
-                              ${whyData.recommended.additionalCost.toFixed(2)}/yr
-                            </span>
-                          </div>
                           {billingCycle === 'annual' && (
                             <div className="flex items-center justify-between py-2 border-b border-gray-100">
                               <span className="text-gray-500">Annual billing cycle</span>
@@ -329,8 +318,6 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                             ? MEDIAZILLA_ENTERPRISE_CONTACT_URL
                             : 'https://mediazilla.com/onboarding'
                         }
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="mt-3 w-full py-3 px-4 rounded font-medium text-sm transition-colors bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer block text-center"
                         onClick={() => setWhyOpen(false)}
                       >

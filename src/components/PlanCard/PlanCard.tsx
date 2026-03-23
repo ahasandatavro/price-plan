@@ -9,7 +9,6 @@ import type { Plan, BillingCycle } from '../../types';
 import {
   calculateOnDemandAdditionalCost,
   formatStorage,
-  getPayAsYouGoRatePerGb,
   isOnDemandWithinRegularLimit
 } from '../../utils/storage';
 
@@ -58,7 +57,6 @@ export const PlanCard: React.FC<PlanCardProps> = ({
     return { name: plan.name, baseCost, additionalGB, additionalCost, totalCost };
   }, [comparisonOptions, plan, requiredStorage]);
   const canGetStarted = meetsRequirement && !isContentSellBlocked;
-  const payAsYouGoPerGb = getPayAsYouGoRatePerGb(plan.name);
   const extraGbRequired =
     requiredStorage > 0 ? Math.max(0, requiredStorage - plan.storage) : 0;
   const extraAnnualPayAsYouGoCost =
@@ -130,32 +128,19 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                   </div>
                 </div>
               </div>
-
-              <div className="mt-4 flex items-start gap-2 py-3 px-4 bg-gray-50 rounded border border-gray-200 border-dashed">
-                <Plus className="w-4 h-4 text-[#AD0FF0] flex-shrink-0 mt-0.5" aria-hidden />
-                <div className="text-left min-w-0">
-                  <p className="text-xs text-gray-500">Pay as you go</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    ${payAsYouGoPerGb.toFixed(2)}/GB per year
-                  </p>
-                  {extraGbRequired > 0 && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      +{formatStorage(extraGbRequired)} extra for your required quota
-                    </p>
-                  )}
-                </div>
-              </div>
             </div>
 
             <div className="space-y-2 mb-6 flex-grow">
-              {plan.features.map((feature, idx) => (
-                <div key={idx} className="flex items-start gap-2">
-                  <div className="mt-0.5 flex-shrink-0">
-                    <Check className="w-4 h-4 text-black" />
+              {plan.features
+                .filter((feature) => !feature.toLowerCase().startsWith('everything in'))
+                .map((feature, idx) => (
+                  <div key={idx} className="flex items-start gap-2">
+                    <div className="mt-0.5 flex-shrink-0">
+                      <Check className="w-4 h-4 text-black" />
+                    </div>
+                    <span className="text-sm text-gray-700">{feature}</span>
                   </div>
-                  <span className="text-sm text-gray-700">{feature}</span>
-                </div>
-              ))}
+                ))}
             </div>
 
             <div className="mt-auto">
@@ -189,8 +174,6 @@ export const PlanCard: React.FC<PlanCardProps> = ({
               {canGetStarted ? (
                 <a
                   href="https://mediazilla.com/onboarding"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className={`w-full py-3 rounded font-medium text-sm transition-colors block text-center ${
                     isRecommended
                       ? 'bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer'
@@ -285,13 +268,6 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                     <span className="font-medium text-gray-800">
                       ${billingCycle === 'annual' ? Math.round(selectedOption.baseCost) : selectedOption.baseCost.toFixed(2)}
                     </span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-gray-500">
-                      Pay as you go
-                      <span className="ml-1 text-xs text-gray-400">({formatStorage(selectedOption.additionalGB)})</span>
-                    </span>
-                    <span className="font-medium text-gray-800">${selectedOption.additionalCost.toFixed(2)}/yr</span>
                   </div>
                   {billingCycle === 'annual' && (
                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
