@@ -6,11 +6,7 @@
 import React from 'react';
 import { Check, Users, Database, HelpCircle, EyeOff } from 'lucide-react';
 import type { EnterprisePlan, BillingCycle } from '../../types';
-import {
-  MEDIAZILLA_ENTERPRISE_CONTACT_URL,
-  ENTERPRISE_ANNUAL_BASE_USD,
-  ENTERPRISE_PREPAID_RATE_TABLE
-} from '../../constants/plans';
+import { MEDIAZILLA_ENTERPRISE_CONTACT_URL, ENTERPRISE_ANNUAL_BASE_USD } from '../../constants/plans';
 import { formatStorage } from '../../utils/storage';
 
 interface EnterprisePlanCardProps {
@@ -35,7 +31,8 @@ export const EnterprisePlanCard: React.FC<EnterprisePlanCardProps> = ({
   const baseAnnualCost = plan.baseCost * 12;
   const totalAnnualCost = baseAnnualCost + plan.additionalCost;
   const isPlaceholder = showPlaceholder || requiredStorage <= 0;
-  const isLockedNonRecommended = isRecommendationLocked && !isRecommended;
+  /** Parent passes true when this card should blur (locked tier). */
+  const isLockedNonRecommended = isRecommendationLocked;
 
   return (
     <div

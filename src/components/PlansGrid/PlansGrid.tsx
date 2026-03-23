@@ -6,11 +6,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { CalculationResult, BillingCycle, EnterprisePlan } from '../../types';
+import type { CalculationResult, BillingCycle, EnterprisePlan, Plan } from '../../types';
 import { PlanCard } from '../PlanCard/PlanCard';
 import { EnterprisePlanCard } from '../EnterprisePlanCard/EnterprisePlanCard';
 import { calculateEnterpriseAdditionalCost, isOnDemandWithinRegularLimit } from '../../utils/storage';
 import { getRangeComparisonForStorage } from '../../utils/planRecommendation';
+import {
+  buildCarouselItems,
+  getUnlockedPlanNamesForRecommendation,
+  isEnterprisePlan
+} from '../../utils/planCarouselOrder';
 import { ENTERPRISE_ANNUAL_BASE_USD } from '../../constants/plans';
 
 interface PlansGridProps {
@@ -49,10 +54,6 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  const isEnterprisePlan = (plan: any): plan is EnterprisePlan => {
-    return plan?.isEnterprise === true;
-  };
-
   const hasCalculation = result.totalStorage > 0 && result.recommendedPlan !== null;
   const calcRecommendedPlan = result.recommendedPlan;
   const shouldBlockStarter = billingCycle === 'annual' && sellContent;
@@ -66,7 +67,6 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   const rangeComparison = hasCalculation
     ? getRangeComparisonForStorage(result.totalStorage, result.allPlans, billingCycle)
     : { options: [] };
-  const shouldLockNonRecommendedPlans = hasCalculation && uiRecommendedPlan !== null;
   const enterpriseBaseMonthly = ENTERPRISE_ANNUAL_BASE_USD / 12;
   const businessStorageCap = (result.allPlans as any).business?.storage ?? 1228.8;
   const enterpriseAdditionalGB = Math.max(0, result.totalStorage - businessStorageCap);
@@ -91,59 +91,25 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   const enterprisePlanForCard =
     uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan) ? uiRecommendedPlan : defaultEnterprisePlan;
 
-  // Sort plans so recommended plan appears first
-  const planEntries = Object.entries(result.allPlans);
-  const sortedPlans = [...planEntries].sort(([_keyA, planA], [_keyB, planB]) => {
-    // Check if planA is recommended
-    const isPlanARecommended = 
-      hasCalculation &&
-      uiRecommendedPlan !== null &&
-      planA.name === uiRecommendedPlan.name &&
-      !isEnterprisePlan(uiRecommendedPlan);
-    
-    // Check if planB is recommended
-    const isPlanBRecommended = 
-      hasCalculation &&
-      uiRecommendedPlan !== null &&
-      planB.name === uiRecommendedPlan.name &&
-      !isEnterprisePlan(uiRecommendedPlan);
-    
-    // Recommended plan should come first
-    if (isPlanARecommended && !isPlanBRecommended) return -1;
-    if (!isPlanARecommended && isPlanBRecommended) return 1;
-    return 0; // Keep original order for non-recommended plans
-  });
+  const planEntries = Object.entries(result.allPlans) as [string, Plan][];
 
-  const isEnterpriseRecommended = Boolean(
-    hasCalculation && uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan)
+  const allPlansForCarousel = buildCarouselItems(
+    billingCycle,
+    planEntries,
+    hasCalculation,
+    uiRecommendedPlan,
+    enterprisePlanForCard
   );
 
-  // Prepare all plans for carousel (enterprise appears first when recommended, otherwise last)
-  const allPlansForCarousel: Array<{ type: 'enterprise' | 'regular'; key: string; plan: any }> = [];
+  const unlockedNames =
+    hasCalculation && uiRecommendedPlan
+      ? getUnlockedPlanNamesForRecommendation(uiRecommendedPlan, billingCycle)
+      : null;
 
-  if (isEnterpriseRecommended) {
-    allPlansForCarousel.push({
-      type: 'enterprise',
-      key: 'enterprise',
-      plan: enterprisePlanForCard
-    });
-  }
-
-  sortedPlans.forEach(([key, plan]) => {
-    allPlansForCarousel.push({
-      type: 'regular',
-      key,
-      plan
-    });
-  });
-
-  if (!isEnterpriseRecommended) {
-    allPlansForCarousel.push({
-      type: 'enterprise',
-      key: 'enterprise',
-      plan: enterprisePlanForCard
-    });
-  }
+  const isPlanLocked = (planName: string): boolean => {
+    if (!unlockedNames) return false;
+    return !unlockedNames.has(planName);
+  };
 
   return (
     <div className="mb-8 relative">
@@ -196,7 +162,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
                       requiredStorage={result.totalStorage}
                       isRecommended={Boolean(hasCalculation && uiRecommendedPlan && isEnterprisePlan(uiRecommendedPlan))}
                       showPlaceholder={!hasCalculation}
-                      isRecommendationLocked={shouldLockNonRecommendedPlans}
+                      isRecommendationLocked={isPlanLocked('Enterprise')}
                     />
                   </div>
                 );
@@ -227,7 +193,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
                     }
                     isContentSellBlocked={contentSellBlocked}
                     contentSellTooltip={contentSellTooltip}
-                    isRecommendationLocked={shouldLockNonRecommendedPlans}
+                    isRecommendationLocked={isPlanLocked(plan.name)}
                   />
                 </div>
               );

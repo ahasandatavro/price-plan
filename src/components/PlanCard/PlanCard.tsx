@@ -32,8 +32,8 @@ interface PlanCardProps {
   /** Shown on the flip side when this card is not the recommended plan */
   recommendedPlanName?: string;
   /**
-   * When true and this card is NOT the recommended plan, the card becomes visually
-   * blurred and its actions are disabled.
+   * When true, this card is blurred and its actions are disabled (locked tier).
+   * When false, card is interactive (recommended tier or adjacent smaller tier).
    */
   isRecommendationLocked?: boolean;
 }
@@ -51,7 +51,8 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   isRecommendationLocked = false
 }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
-  const isLockedNonRecommended = isRecommendationLocked && !isRecommended;
+  /** Parent passes true only for cards that should blur (not recommended + not companion tier). */
+  const isLockedNonRecommended = isRecommendationLocked;
   const selectedOption = React.useMemo((): WhyRecommendationOption | undefined => {
     const existing = comparisonOptions.find((option) => option.name === plan.name);
     if (existing) return existing;
