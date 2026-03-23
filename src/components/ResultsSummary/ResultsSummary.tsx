@@ -318,6 +318,8 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                             ? MEDIAZILLA_ENTERPRISE_CONTACT_URL
                             : 'https://mediazilla.com/onboarding'
                         }
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="mt-3 w-full py-3 px-4 rounded font-medium text-sm transition-colors bg-gradient-to-r from-[#594AE0] to-[#AD0FF0] text-white hover:opacity-90 cursor-pointer block text-center"
                         onClick={() => setWhyOpen(false)}
                       >
