@@ -245,7 +245,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                   >
                     <HelpCircle className={`w-3.5 h-3.5 ${isRecommended ? 'text-[#594AE0]' : 'text-gray-600'}`} aria-hidden />
                   </span>
-                  {isRecommended ? 'Price breakdown' : 'Why not recommended?'}
+                  {isRecommended ? 'Price breakdown' : 'Price breakdown'}
                 </button>
               )}
 
@@ -309,7 +309,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
           >
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-white">
-                {isRecommended ? 'Price breakdown' : 'Why not recommended'}
+                {isRecommended ? 'Price breakdown' : 'Price breakdown'}
               </p>
               <h3 className="text-base font-semibold text-white mt-0.5">{plan.name}</h3>
             </div>
