@@ -181,7 +181,10 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
                     isRecommended={isRecommended}
                     meetsRequirement={meetsRequirement}
                     requiredStorage={result.totalStorage}
-                    comparisonOptions={isRecommended ? rangeComparison.options : []}
+                    comparisonOptions={hasCalculation ? rangeComparison.options : []}
+                    recommendedPlanName={
+                      hasCalculation && uiRecommendedPlan ? uiRecommendedPlan.name : undefined
+                    }
                     isContentSellBlocked={contentSellBlocked}
                     contentSellTooltip={contentSellTooltip}
                   />
