@@ -31,12 +31,15 @@ interface ResultsSummaryProps {
 export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingCycle, sellContent }) => {
   const calcRecommendedPlan = result.recommendedPlan;
   const shouldBlockStarter = billingCycle === 'annual' && sellContent;
+  const shouldUseBusinessForMonthly =
+    billingCycle === 'monthly' && (calcRecommendedPlan as any)?.isEnterprise === true;
 
-  const recommendedPlan =
-    shouldBlockStarter &&
-    calcRecommendedPlan &&
-    !((calcRecommendedPlan as any)?.isEnterprise === true) &&
-    calcRecommendedPlan.name === 'Starter'
+  const recommendedPlan = shouldUseBusinessForMonthly
+    ? ((result.allPlans as any).business ?? calcRecommendedPlan)
+    : shouldBlockStarter &&
+      calcRecommendedPlan &&
+      !((calcRecommendedPlan as any)?.isEnterprise === true) &&
+      calcRecommendedPlan.name === 'Starter'
       ? ((result.allPlans as any).growth ?? calcRecommendedPlan)
       : calcRecommendedPlan;
 

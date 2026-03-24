@@ -57,11 +57,14 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   const hasCalculation = result.totalStorage > 0 && result.recommendedPlan !== null;
   const calcRecommendedPlan = result.recommendedPlan;
   const shouldBlockStarter = billingCycle === 'annual' && sellContent;
-  const uiRecommendedPlan =
-    shouldBlockStarter &&
-    calcRecommendedPlan &&
-    !isEnterprisePlan(calcRecommendedPlan) &&
-    calcRecommendedPlan.name === 'Starter'
+  const shouldUseBusinessForMonthly =
+    billingCycle === 'monthly' && calcRecommendedPlan && isEnterprisePlan(calcRecommendedPlan);
+  const uiRecommendedPlan = shouldUseBusinessForMonthly
+    ? ((result.allPlans as any).business ?? calcRecommendedPlan)
+    : shouldBlockStarter &&
+      calcRecommendedPlan &&
+      !isEnterprisePlan(calcRecommendedPlan) &&
+      calcRecommendedPlan.name === 'Starter'
       ? ((result.allPlans as any).growth ?? calcRecommendedPlan)
       : calcRecommendedPlan;
   const rangeComparison = hasCalculation
@@ -100,6 +103,10 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
     uiRecommendedPlan,
     enterprisePlanForCard
   );
+  const visiblePlansForCarousel =
+    billingCycle === 'monthly'
+      ? allPlansForCarousel.filter((entry) => entry.type !== 'enterprise')
+      : allPlansForCarousel;
 
   const unlockedNames =
     hasCalculation && uiRecommendedPlan
@@ -152,7 +159,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
       <div className="relative px-2">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex gap-8">
-            {allPlansForCarousel.map(({ type, key, plan }) => {
+            {visiblePlansForCarousel.map(({ type, key, plan }) => {
               if (type === 'enterprise') {
                 return (
                   <div key={key} className="flex-[0_0_100%] md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.33rem)] min-w-0">
