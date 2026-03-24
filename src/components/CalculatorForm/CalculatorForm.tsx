@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Film, Clock } from 'lucide-react';
+
 import type { StorageInputs } from '../../types';
 
 interface CalculatorFormProps {
