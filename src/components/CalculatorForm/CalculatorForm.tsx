@@ -72,7 +72,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
         {/* Projects in next 12 months */}
         <div>
           <label htmlFor="films" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <Film className="w-4 h-4 text-gray-500 hidden sm:block" />
+
             How many projects do you plan to deliver in the next 12 months?
           </label>
           <input
@@ -90,8 +90,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({ inputs, onInputC
 
         {/* Average video length per project */}
         <div>
-          <label htmlFor="duration" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <Clock className="w-4 h-4 text-gray-500 hidden sm:block" />
+          <label htmlFor="duration" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 ">
             What is the average length of videos per project (in mins)?
           </label>
           <input
