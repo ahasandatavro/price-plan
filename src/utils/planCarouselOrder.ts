@@ -1,6 +1,7 @@
 /**
  * Which plan cards stay unblurred when a recommendation exists:
- * the recommended tier + the next-smaller tier (except Starter-only: only Starter).
+ * the recommended tier + the comparison tier (next-smaller when one exists;
+ * for Starter, the next tier up — Growth — since there is no tier below Starter).
  * Enterprise recommended → Business + Enterprise unlocked.
  */
 
@@ -32,7 +33,7 @@ export function getUnlockedPlanNamesForRecommendation(
   const name = recommended.name;
 
   if (name === 'Starter') {
-    return new Set(['Starter']);
+    return new Set(['Starter', 'Growth']);
   }
 
   const idx = tierOrder.indexOf(name);
@@ -64,7 +65,7 @@ export function getUnlockedRegularCarouselOrder(
   const name = recommended.name;
 
   if (name === 'Starter') {
-    return ['Starter'];
+    return ['Starter', 'Growth'];
   }
 
   const idx = tierOrder.indexOf(name);
