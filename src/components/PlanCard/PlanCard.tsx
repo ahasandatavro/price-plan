@@ -71,15 +71,6 @@ export const PlanCard: React.FC<PlanCardProps> = ({
     extraGbRequired > 0 ? calculateOnDemandAdditionalCost(extraGbRequired, plan.name) : 0;
 
   const showInsightButton = requiredStorage > 0 && selectedOption !== undefined;
-  const formatStorageCompact = (gb: number): string => {
-    if (gb >= 1024) {
-      const tb = gb / 1024;
-      const rounded = Math.round(tb * 10) / 10;
-      return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)} TB`;
-    }
-    const rounded = Math.round(gb * 10) / 10;
-    return `${rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1)} GB`;
-  };
 
   return (
     <div
@@ -148,7 +139,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                         Upload quota
                       </p>
                       <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {formatStorageCompact(plan.storage)}
+                        {formatStorage(plan.storage)}
                       </p>
                       <p className="text-[11px] text-gray-500">per year</p>
                     </div>

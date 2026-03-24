@@ -71,25 +71,14 @@ export const getEnterpriseTierRate = (storageGB: number): number => {
 };
 
 /**
- * Format storage size with appropriate unit
+ * Format storage size with appropriate unit (always two decimal places).
  */
 export const formatStorage = (gb: number): string => {
   if (gb >= 1024) {
     const tb = gb / 1024;
-    const rounded = Math.round(tb * 10) / 10;
-    return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)} TB`;
+    return `${tb.toFixed(2)} TB`;
   }
-
-  if (Number.isInteger(gb)) return `${gb.toFixed(0)} GB`;
-
-  // Visualization rounding: snap to nearest even whole number.
-  // Examples: 45.48 -> 44, 45.83 -> 46
-  const whole = Math.floor(gb);
-  const fractional = gb - whole;
-  const evenDown = whole % 2 === 0 ? whole : whole - 1;
-  const evenUp = whole % 2 === 0 ? whole + 2 : whole + 1;
-  const visualized = fractional >= 0.5 ? evenUp : evenDown;
-  return `${Math.max(0, visualized)} GB`;
+  return `${Math.max(0, gb).toFixed(2)} GB`;
 };
 
 /**
