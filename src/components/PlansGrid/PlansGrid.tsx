@@ -114,7 +114,7 @@ export const PlansGrid: React.FC<PlansGridProps> = ({ result, billingCycle, sell
   return (
     <div className="mb-8 relative">
       <div className="text-center mb-12 relative">
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-3">
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-3 mt-20">
           Choose Your Perfect Plan
         </h2>
         <p className="text-lg text-gray-600">
