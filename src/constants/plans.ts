@@ -171,8 +171,14 @@ export const ENTERPRISE_PREPAID_RATE_TABLE = [
   { rangeLabel: '2.61+ TB', rateUsdPerGb: 0.75 }
 ] as const;
 
-/** Enterprise CTA — https://mediazilla.com/contact-us */
-export const MEDIAZILLA_ENTERPRISE_CONTACT_URL = 'https://mediazilla.com/contact-us';
+/** UTM params for leads from the Quota Calculator (Vercel app). */
+const QUOTA_CALCULATOR_UTM =
+  '?utm_source=MZ_Website&utm_medium=Quota_Calculator&utm_campaign=20260325_QuotaCalculatorExperiment';
+
+export const MEDIAZILLA_ONBOARDING_URL = `https://mediazilla.com/onboarding${QUOTA_CALCULATOR_UTM}`;
+
+/** Enterprise CTA — contact sales */
+export const MEDIAZILLA_ENTERPRISE_CONTACT_URL = `https://mediazilla.com/contact-us${QUOTA_CALCULATOR_UTM}`;
 
 // Regular-plan on-demand availability is capped at 10.0TB additional quota.
 export const ON_DEMAND_MAX_ADDITIONAL_GB = 10240;

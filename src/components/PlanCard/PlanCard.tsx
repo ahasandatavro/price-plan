@@ -6,6 +6,7 @@
 import React from 'react';
 import { Check, Database, EyeOff, HelpCircle, Plus, Users } from 'lucide-react';
 import type { Plan, BillingCycle } from '../../types';
+import { MEDIAZILLA_ONBOARDING_URL } from '../../constants/plans';
 import {
   calculateOnDemandAdditionalCost,
   formatStorage,
@@ -254,7 +255,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
 
               {canGetStarted ? (
                 <a
-                  href="https://mediazilla.com/onboarding"
+                  href={MEDIAZILLA_ONBOARDING_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`w-full py-3 rounded font-medium text-sm transition-colors block text-center ${

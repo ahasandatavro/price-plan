@@ -19,6 +19,7 @@ import {
   ENTERPRISE_MIN_BUSINESS_ANNUAL_TOTAL_USD,
   ENTERPRISE_MIN_TOTAL_GB,
   MEDIAZILLA_ENTERPRISE_CONTACT_URL,
+  MEDIAZILLA_ONBOARDING_URL,
   PLANS
 } from '../../constants/plans';
 
@@ -324,7 +325,7 @@ export const ResultsSummary: React.FC<ResultsSummaryProps> = ({ result, billingC
                         href={
                           isEnterprise
                             ? MEDIAZILLA_ENTERPRISE_CONTACT_URL
-                            : 'https://mediazilla.com/onboarding'
+                            : MEDIAZILLA_ONBOARDING_URL
                         }
                         target="_blank"
                         rel="noopener noreferrer"
